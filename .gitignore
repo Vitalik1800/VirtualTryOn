@@ -1,0 +1,57 @@
+# ============================================================
+# Virtual Try-On
+# Python .gitignore
+# ============================================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Python cache
+.pytest_cache/
+.mypy_cache/
+.cache/
+
+# IDE
+.idea/
+.vscode/
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Output
+output/*
+!output/.gitkeep
+
+# Temporary files
+*.tmp
+*.bak
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment
+.env
+
+# Coverage
+.coverage
+htmlcov/
+
+# Test reports
+test-results/
