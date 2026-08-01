@@ -126,7 +126,7 @@ class StatusBar(ctk.CTkFrame):
     # Update camera status
     # ===
 
-    def set_camera(self, text):
+    def set_camera_status(self, text):
 
         self.camera_label.configure(
             text=f"Camera: {text}"

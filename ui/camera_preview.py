@@ -1,24 +1,24 @@
 """
     Project: Virtual Try-On
 
-    Stage: 2
-    Substage: 2.6 - Create Camera Preview
+    Stage: 3
+    Substage: 3.5 - Camera Preview
 
     Description:
-    Camera preview area.
+    Video preview widget.
 """
 
 # ===
-# Stage 2.6
+# Stage 3.5
 # Import libraries
 # ===
 
-import customtkinter as ctk
+import tkinter as tk
 
 from ui.theme import *
 
 # ===
-# Stage 2.6
+# Stage 3.5
 # Camera Preview
 # ===
 
@@ -31,7 +31,7 @@ class CameraPreview(ctk.CTkFrame):
         self.create_widgets()
 
     # ===
-    # Stage 2.6
+    # Stage 3.5
     # Configure preview area
     # ===
 
@@ -42,19 +42,27 @@ class CameraPreview(ctk.CTkFrame):
             border_width=PREVIEW_BORDER_WIDTH
         )
 
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
     # ===
-    # Stage 2.6
+    # Stage 3.6
     # Create preview widgets
     # ===
 
     def create_widgets(self):
 
-        self.preview_label = ctk.CTkLabel(
+        self.preview_label = tk.Label(
             self,
             text="Camera Preview",
+            image=None,
             font=TITLE_FONT
         )
 
-        self.preview_label.pack(
-            expand=True
+        self.preview_label.grid(
+            row=0,
+            column=0,
+            padx=10,
+            pady=10,
+            sticky="nsew"
         )

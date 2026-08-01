@@ -18,6 +18,15 @@ from ui.toolbar import Toolbar
 from ui.sidebar import Sidebar
 from ui.camera_preview import CameraPreview
 from ui.statusbar import StatusBar
+from core.camera import Camera
+from core.image_manager import ImageManager
+
+# ===
+# Stage 3.7
+# Import message box
+# ===
+
+from tkinter import messagebox
 
 # ===
 # Stage 2.1
@@ -41,6 +50,22 @@ class MainWindow(ctk.CTk):
             self.iconbitmap("assets/icons/app.ico")
         except Exception:
             pass
+
+        # ===
+        # Stage 3.5
+        # Camera
+        # ===
+
+        self.camera = Camera()
+
+        self.is_camera_running = False
+
+        # ===
+        # Stage 3.5
+        # Camera update job
+        # ===
+
+        self.camera_job = None
 
         # ===
         # Stage 2.8
@@ -143,6 +168,14 @@ class MainWindow(ctk.CTk):
             sticky="ew"
         )
 
+        self.toolbar.start_button.configure(
+            command=self.start_camera
+        )
+
+        self.toolbar.stop_button.configure(
+            command=self.stop_camera
+        )
+
         # Sidebar
 
         self.sidebar = Sidebar(self.main_frame)
@@ -173,9 +206,9 @@ class MainWindow(ctk.CTk):
         # Create status bar
         # ===
 
-        self.statusbar = StatusBar(self.main_frame)
+        self.status_bar = StatusBar(self.main_frame)
 
-        self.statusbar.grid(
+        self.status_bar.grid(
             row=2,
             column=0,
             columnspan=2,
@@ -183,28 +216,186 @@ class MainWindow(ctk.CTk):
         )
 
     # ===
-    # Stage 2.8
+    # Stage 3.5
     # Start camera
     # ===
 
     def start_camera(self, event=None):
 
-        print("Start camera")
+        if self.is_camera_running:
+            return
+
+        if self.camera.open():
+
+            self.is_camera_running = True
+
+            self.status_bar.set_status("Camera Started")
+            self.status_bar.set_camera_status("Connected")
+
+            self.update_camera()
+
+        else:
+
+            self.status_bar.set_status("Camera Error")
+            self.status_bar.set_camera_status("Unavailable")
+
+            self.show_error(
+                "Camera Error",
+                "Unable to access the camera.\n\n"
+                "Possible reasons:\n"
+                "- Camera is not connected.\n"
+                "- Camera is already in use.\n"
+                "- Access to the camera is denied."
+            )
 
     # ===
-    # Stage 2.8
+    # Stage 3.5
+    # Update preview
+    # ===
+
+    def update_camera(self):
+
+        try:
+
+            if not self.is_camera_running:
+                return
+
+            if not self.winfo_exists():
+                return
+
+            success, frame = self.camera.read()
+
+            if not success:
+
+                self.stop_camera()
+
+                self.show_error(
+                    "Camera Error",
+                    "Failed to read video frame."
+                )
+
+                return
+
+            image = ImageManager.frame_to_photo(
+                frame,
+                (
+                    PREVIEW_WIDTH,
+                    PREVIEW_HEIGHT
+                )
+            )
+
+            if image is None:
+                return
+
+            self.camera_preview.preview_label.configure(
+                image=image,
+                text=""
+            )
+
+            self.camera_preview.preview_label.image = image
+
+            if self.is_camera_running:
+                self.camera_job = self.after(
+                    15,
+                    self.update_camera
+                )
+
+        except Exception as error:
+
+            self.stop_camera()
+
+            self.show_error(
+                "Unexpected Error",
+                str(error)
+            )
+        
+    # ===
+    # Stage 3.5
     # Stop camera
     # ===
 
     def stop_camera(self, event=None):
 
-        print("Stop camera")
+        self.is_camera_running = False
+
+        if self.camera_job is not None:
+
+            self.after_cancel(self.camera_job)
+
+            self.camera_job = None
+
+        if self.camera.is_opened():
+
+            self.camera.release()
+
+        # ===
+        # Stage 3.6
+        # Clear camera preview
+        # ===
+
+        self.camera_preview.preview_label.configure(
+            image=None,
+            text="Camera Preview"
+        )
+
+        self.camera_preview.preview_label.image = None
+
+        self.status_bar.set_status("Ready")
+        self.status_bar.set_camera_status("Disconnected")
+        self.status_bar.set_fps(0)
 
     # ===
-    # Stage 2.8
+    # Stage 3.7
+    # Show error message
+    # ===
+
+    def show_error(self, title, message):
+
+        messagebox.showerror(
+            title,
+            message
+        )
+
+    # ===
+    # Stage 3.8
     # Close application
     # ===
 
     def close_application(self, event=None):
 
+        # Stop camera loop
+
+        self.is_camera_running = False
+
+        # Cancel scheduled update
+
+        if self.camera_job is not None:
+
+            self.after_cancel(self.camera_job)
+
+            self.camera_job = None
+
+        # Release camera
+
+        if self.camera.is_opened():
+
+            self.camera.release()
+
+        # ===
+        # Stage 3.8
+        # Clear preview
+        # ===
+
+        if hasattr(self.camera_preview, "preview_label"):
+
+            self.camera_preview.preview_label.configure(
+                image="",
+                text="Camera Preview"
+            )
+
+            self.camera_preview.preview_label.image = None
+
+        # Destroy application window
+        
         self.destroy()
+
