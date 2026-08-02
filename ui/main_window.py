@@ -398,6 +398,9 @@ class MainWindow(ctk.CTk):
         if hasattr(self, "face_detector"):
             self.face_detector.close()
 
+        if hasattr(self, "accessory_manager"):
+            self.accessory_manager.close()
+            
         # Destroy application window
         
         self.destroy()
