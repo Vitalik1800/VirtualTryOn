@@ -162,8 +162,8 @@ class Camera:
         """
 
         # ===
-        # Stage 3.1
-        # Release camera
+        # Stage 3.8
+        # Release camera resources
         # ===
 
         if self.capture is not None:

@@ -389,11 +389,14 @@ class MainWindow(ctk.CTk):
         if hasattr(self.camera_preview, "preview_label"):
 
             self.camera_preview.preview_label.configure(
-                image="",
+                image=None,
                 text="Camera Preview"
             )
 
             self.camera_preview.preview_label.image = None
+
+        if hasattr(self, "face_detector"):
+            self.face_detector.close()
 
         # Destroy application window
         
