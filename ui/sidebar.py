@@ -14,6 +14,8 @@
 # ===
 
 import customtkinter as ctk
+import tkinter as tk
+import os
 
 from ui.theme import *
 
@@ -24,8 +26,16 @@ from ui.theme import *
 
 class Sidebar(ctk.CTkFrame):
 
-    def __init__(self, master):
+    def __init__(
+        self,
+        master,
+        category_callback,
+        selection_callback
+    ):
         super().__init__(master)
+
+        self.callback = category_callback
+        self.selection_callback = selection_callback
 
         self.configure_sidebar()
         self.create_widgets()
@@ -74,7 +84,8 @@ class Sidebar(ctk.CTkFrame):
                 "Necklaces",
                 "Watches"
             ],
-            width=200
+            width=200,
+            command=self.callback
         )
 
         self.category_menu.pack(
@@ -93,26 +104,61 @@ class Sidebar(ctk.CTkFrame):
 
         # Accessories list
 
-        self.accessory_list = ctk.CTkTextbox(
+        self.accessory_list = tk.Listbox(
             self,
-            width=220,
-            height=380
+            width=28,
+            height=18,
+            font=("Segoe UI", 11),
+            exportselection=False
         )
 
         self.accessory_list.pack(
-            pady=10
+            pady=10,
+            padx=10,
+            fill="both",
+            expand=True
         )
 
-        self.accessory_list.insert(
-            "end",
-            "- Aviator Glasses\n"
-            "- Round Glasses\n"
-            "- Baseball Cap\n"
-            "- Earrings\n"
-            "- Necklace\n"
-            "- Smart Watch"
+        self.accessory_list.bind(
+            "<<ListboxSelect>>",
+            self.on_accessory_selected
         )
 
-        self.accessory_list.configure(
-            state="disabled"
-        )
+    def on_accessory_selected(self, event):
+
+        selection = self.accessory_list.curselection()
+
+        if not selection:
+            return
+
+        index = selection[0]
+
+        if hasattr(self, "selection_callback"):
+            self.selection_callback(index)
+
+    def update_accessories(self, accessories):
+
+        self.accessory_list.delete(0, tk.END)
+
+        for path in accessories:
+
+            name = os.path.splitext(
+                os.path.basename(path)
+            )[0]
+
+            self.accessory_list.insert(
+                tk.END,
+                name
+            )
+
+        if accessories:
+            
+            self.accessory_list.selection_clear(0, tk.END)
+
+            self.accessory_list.selection_set(0)
+
+            self.accessory_list.activate(0)
+
+            self.accessory_list.event_generate(
+                "<<ListboxSelect>>"
+            )

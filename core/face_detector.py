@@ -126,15 +126,11 @@ class FaceDetector:
             cv2.COLOR_BGR2RGB
         )
 
-        rgb_frame.flags.writable = False
-
         # Detect face
 
         results = self.face_mesh.process(
             rgb_frame
         )
-
-        rgb_frame.flags.writable = True
 
         if results.multi_face_landmarks:
 

@@ -20,6 +20,9 @@ from ui.camera_preview import CameraPreview
 from ui.statusbar import StatusBar
 from core.camera import Camera
 from core.image_manager import ImageManager
+from core.face_detector import FaceDetector
+from core.accessory_manager import AccessoryManager
+from core.accessory_renderer import AccessoryRenderer
 
 # ===
 # Stage 3.7
@@ -57,6 +60,15 @@ class MainWindow(ctk.CTk):
         # ===
 
         self.camera = Camera()
+        self.face_detector = FaceDetector()
+        self.accessory_manager = AccessoryManager()
+
+        # ===
+        # Stage 6.2
+        # Accessory Renderer
+        # ===
+
+        self.accessory_renderer = AccessoryRenderer()
 
         self.is_camera_running = False
 
@@ -178,7 +190,11 @@ class MainWindow(ctk.CTk):
 
         # Sidebar
 
-        self.sidebar = Sidebar(self.main_frame)
+        self.sidebar = Sidebar(
+            self.main_frame,
+            self.change_category,
+            self.change_accessory
+        )
 
         self.sidebar.grid(
             row=1,
@@ -276,6 +292,29 @@ class MainWindow(ctk.CTk):
 
                 return
 
+            # ===
+            # Stage 6.2
+            # Accessory rendering
+            # ===
+
+            results = self.face_detector.detect(frame)
+
+            points = self.face_detector.get_landmark_points(
+                results,
+                frame
+            )
+
+            accessory = self.accessory_manager.get_current_accessory()
+
+            path = self.accessory_manager.get_current_path()
+
+            frame = self.accessory_renderer.render(
+                frame,
+                accessory,
+                points,
+                path
+            )
+
             image = ImageManager.frame_to_photo(
                 frame,
                 (
@@ -356,6 +395,17 @@ class MainWindow(ctk.CTk):
             message
         )
 
+    def change_accessory(self, index):
+        self.accessory_manager.select_accessory(index)
+
+    def change_category(self, value):
+
+        if self.accessory_manager.select_category(value.lower()):
+
+            self.sidebar.update_accessories(
+                self.accessory_manager.current_accessories
+            )
+
     # ===
     # Stage 3.8
     # Close application
@@ -386,20 +436,14 @@ class MainWindow(ctk.CTk):
         # Clear preview
         # ===
 
-        if hasattr(self.camera_preview, "preview_label"):
-
-            self.camera_preview.preview_label.configure(
-                image=None,
-                text="Camera Preview"
-            )
-
-            self.camera_preview.preview_label.image = None
-
         if hasattr(self, "face_detector"):
             self.face_detector.close()
 
         if hasattr(self, "accessory_manager"):
             self.accessory_manager.close()
+
+        if hasattr(self, "accessory_renderer"):
+            self.accessory_renderer.close()
             
         # Destroy application window
         

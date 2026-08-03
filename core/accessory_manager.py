@@ -273,6 +273,29 @@ class AccessoryManager:
 
     # ===
     # Stage 5.6
+    # Select accessory by index
+    # ===
+
+    def select_accessory(self, index):
+        """
+        Select accessory by index.
+
+        Args:
+            index: Accessory index.
+        """
+
+        if not self.current_accessories:
+            return False
+
+        if index < 0 or index >= len(self.current_accessories):
+            return False
+
+        self.current_index = index
+
+        return True
+
+    # ===
+    # Stage 5.6
     # Get current accessory
     # ===
 

@@ -1,0 +1,26 @@
+import cv2
+
+from core.accessory_manager import AccessoryManager
+from core.accessory_renderer import AccessoryRenderer
+
+manager = AccessoryManager()
+renderer = AccessoryRenderer()
+
+frame = cv2.imread("tests/test_face.png")
+
+accessory = manager.load_accessory(
+    "assets/accessories/glasses/glasses_01.png"
+)
+
+frame = renderer.alpha_blend(
+    frame,
+    accessory,
+    (250, 150)
+)
+
+cv2.imshow("Alpha Blend", frame)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+manager.close()
+renderer.close()
