@@ -24,6 +24,9 @@ from core.face_detector import FaceDetector
 from core.accessory_manager import AccessoryManager
 from core.accessory_renderer import AccessoryRenderer
 from core.photo_manager import PhotoManager
+from core.video_manager import VideoManager
+import cv2
+import time
 
 # ===
 # Stage 3.7
@@ -75,6 +78,8 @@ class MainWindow(ctk.CTk):
 
         self.photo_manager = PhotoManager()
 
+        self.video_manager = VideoManager()
+
         # ===
         # Stage 3.5
         # Camera update job
@@ -104,6 +109,8 @@ class MainWindow(ctk.CTk):
         )
 
         self.update_controls()
+
+        self.last_time = time.perf_counter()
 
     # ===
     # Stage 2.1
@@ -261,6 +268,47 @@ class MainWindow(ctk.CTk):
             self.status_bar.set_status("Camera Started")
             self.status_bar.set_camera_status("Connected")
 
+            if not self.video_manager.has_save_directory():
+
+                self.video_manager.select_directory()
+
+                if not self.video_manager.has_save_directory():
+                    return
+
+            output_path = self.video_manager.create_output_path()
+
+            width = int(
+                self.camera.capture.get(
+                    cv2.CAP_PROP_FRAME_WIDTH
+                )
+            )
+
+            height = int(
+                self.camera.capture.get(
+                    cv2.CAP_PROP_FRAME_HEIGHT
+                )
+            )
+
+            if not self.video_manager.start_recording(
+                output_path,
+                width,
+                height
+            ):
+                self.show_error(
+                    "Video Error",
+                    "Unable to start video recording."
+                )
+
+                self.stop_camera()
+
+                return
+
+            self.status_bar.set_status(
+                "Recording started."
+            )
+
+            self.last_time = time.perf_counter()
+            
             self.update_camera()
 
         else:
@@ -305,6 +353,16 @@ class MainWindow(ctk.CTk):
 
                 return
 
+            current = time.perf_counter()
+
+            delta = current - self.last_time
+
+            if delta > 0:
+                fps = 1.0 / delta
+                self.status_bar.set_fps(int(fps))
+
+            self.last_time = current
+                        
             # ===
             # Stage 6.2
             # Accessory rendering
@@ -322,6 +380,8 @@ class MainWindow(ctk.CTk):
                 points,
                 path
             )
+
+            self.video_manager.write(frame)
 
             self.photo_manager.update_frame(frame.copy())
 
@@ -378,6 +438,31 @@ class MainWindow(ctk.CTk):
             self.camera.release()
 
         # ===
+        # Stage 9.5
+        # Stop video recording
+        # ===
+
+        self.status_bar.set_camera_status("Disconnected")
+        self.status_bar.set_fps(0)
+
+        if self.video_manager.is_recording:
+
+            self.video_manager.stop_recording()
+
+            self.status_bar.set_status(
+                "Video saved successfully."
+            )
+
+            self.after(
+                1500,
+                lambda: self.status_bar.set_status("Ready")
+            )
+
+        else:
+
+            self.status_bar.set_status("Ready")
+
+        # ===
         # Stage 3.6
         # Clear camera preview
         # ===
@@ -389,7 +474,6 @@ class MainWindow(ctk.CTk):
 
         self.camera_preview.preview_label.image = None
 
-        self.status_bar.set_status("Ready")
         self.status_bar.set_camera_status("Disconnected")
         self.status_bar.set_fps(0)
 
@@ -553,6 +637,9 @@ class MainWindow(ctk.CTk):
 
         if hasattr(self, "photo_manager"):
             self.photo_manager.close()
+
+        if hasattr(self, "video_manager"):
+            self.video_manager.close()
             
         # Destroy application window
         
