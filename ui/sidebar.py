@@ -80,9 +80,7 @@ class Sidebar(ctk.CTkFrame):
             values=[
                 "Glasses",
                 "Hats",
-                "Earrings",
-                "Necklaces",
-                "Watches"
+                "Earrings"
             ],
             width=200,
             command=self.callback
@@ -123,6 +121,26 @@ class Sidebar(ctk.CTkFrame):
             "<<ListboxSelect>>",
             self.on_accessory_selected
         )
+
+    def select_accessory(self, index):
+
+        """
+        Select accessory in ListBox.
+        """
+
+        if index < 0:
+            return
+
+        self.accessory_list.selection_clear(
+            0,
+            tk.END
+        )
+
+        self.accessory_list.selection_set(index)
+
+        self.accessory_list.activate(index)
+
+        self.accessory_list.event_generate("<<ListboxSelect>>")
 
     def on_accessory_selected(self, event):
 

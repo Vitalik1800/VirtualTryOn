@@ -390,3 +390,24 @@ class FaceDetector:
             and
             results.multi_face_landmarks is not None
         )
+
+    def process(self, frame):
+        """
+        Detect face and return landmark points.
+
+        Args:
+            frame: OpenCV frame.
+
+        Returns:
+            List of landmark points or empty list.
+        """
+
+        if frame is None:
+            return []
+
+        results = self.detect(frame)
+
+        return self.get_landmark_points(
+            results,
+            frame
+        )

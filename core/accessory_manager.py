@@ -41,10 +41,6 @@ class AccessoryManager:
             "accessories"
         )
 
-        # Available accessories
-
-        self.accessories = []
-
         # Cached images
 
         self.cache = {}
@@ -68,13 +64,6 @@ class AccessoryManager:
         ]
 
         # ===
-        # Stage 5.4
-        # Accessory cache
-        # ===
-
-        self.cache = {}
-
-        # ===
         # Stage 5.6
         # Current accessory
         # ===
@@ -93,7 +82,7 @@ class AccessoryManager:
         Clear loaded accessories.
         """
 
-        self.accessories.clear()
+        self.current_accessories.clear()
         self.cache.clear()
         self.current_accessory = None
 
@@ -214,8 +203,7 @@ class AccessoryManager:
             return []
 
         folder = os.path.join(
-            "assets",
-            "accessories",
+            self.accessories_path,
             category
         )
 
@@ -224,7 +212,7 @@ class AccessoryManager:
 
         accessories = []
 
-        for file_name in os.listdir(folder):
+        for file_name in sorted(os.listdir(folder)):
 
             if file_name.lower().endswith(".png"):
 
@@ -235,10 +223,8 @@ class AccessoryManager:
                     )
                 )
 
-        accessories.sort()
-
         return accessories
-
+    
     # ===
     # Stage 5.6
     # Select accessory category
@@ -341,11 +327,15 @@ class AccessoryManager:
         """
 
         if not self.current_accessories:
-            return
+            return -1
 
         self.current_index = (
             self.current_index + 1
         ) % len(self.current_accessories)
+
+        self.get_current_accessory()
+
+        return self.current_index
 
     # ===
     # Stage 5.6
@@ -358,11 +348,28 @@ class AccessoryManager:
         """
 
         if not self.current_accessories:
-            return
+            return -1
 
         self.current_index = (
             self.current_index - 1
         ) % len(self.current_accessories)
+
+        self.get_current_accessory()
+
+        return self.current_index
+
+    # ===
+    # Stage 7.4
+    # Clear current accessory
+    # ===
+    def clear_selection(self):
+        """
+        Clear current accessory.
+        """
+
+        self.current_accessory = None
+        self.current_path = None
+        self.current_index = -1
 
     # ===
     # Stage 5.8

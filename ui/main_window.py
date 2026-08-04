@@ -87,6 +87,8 @@ class MainWindow(ctk.CTk):
         self.bind("<F5>", self.start_camera)
         self.bind("<Escape>", self.stop_camera)
         self.bind("<Control-q>", self.close_application)
+        self.bind_all("<Left>", self.previous_accessory)
+        self.bind_all("<Right>", self.next_accessory)
 
         # ===
         # Stage 2.8
@@ -97,6 +99,8 @@ class MainWindow(ctk.CTk):
             "WM_DELETE_WINDOW",
             self.close_application
         )
+
+        self.update_controls()
 
     # ===
     # Stage 2.1
@@ -245,6 +249,8 @@ class MainWindow(ctk.CTk):
 
             self.is_camera_running = True
 
+            self.update_controls()
+
             self.status_bar.set_status("Camera Started")
             self.status_bar.set_camera_status("Connected")
 
@@ -263,7 +269,7 @@ class MainWindow(ctk.CTk):
                 "- Camera is already in use.\n"
                 "- Access to the camera is denied."
             )
-
+            
     # ===
     # Stage 3.5
     # Update preview
@@ -297,12 +303,7 @@ class MainWindow(ctk.CTk):
             # Accessory rendering
             # ===
 
-            results = self.face_detector.detect(frame)
-
-            points = self.face_detector.get_landmark_points(
-                results,
-                frame
-            )
+            points = self.face_detector.process(frame)
 
             accessory = self.accessory_manager.get_current_accessory()
 
@@ -383,6 +384,8 @@ class MainWindow(ctk.CTk):
         self.status_bar.set_camera_status("Disconnected")
         self.status_bar.set_fps(0)
 
+        self.update_controls()
+
     # ===
     # Stage 3.7
     # Show error message
@@ -395,6 +398,28 @@ class MainWindow(ctk.CTk):
             message
         )
 
+    def update_controls(self):
+
+        running = self.is_camera_running
+
+        self.toolbar.start_button.configure(
+            state="disabled" if running else "normal"
+        )
+
+        self.toolbar.stop_button.configure(
+            state="normal" if running else "disabled"
+        )
+
+        state = "normal" if running else "disabled"
+
+        self.sidebar.category_menu.configure(
+            state=state
+        )
+
+        self.sidebar.accessory_list.configure(
+            state=state
+        )
+
     def change_accessory(self, index):
         self.accessory_manager.select_accessory(index)
 
@@ -402,9 +427,27 @@ class MainWindow(ctk.CTk):
 
         if self.accessory_manager.select_category(value.lower()):
 
-            self.sidebar.update_accessories(
+            accessories = (
                 self.accessory_manager.current_accessories
             )
+
+            self.sidebar.update_accessories(
+                accessories
+            )
+
+            self.sidebar.select_accessory(0)
+
+    def previous_accessory(self, event=None):
+
+        index = self.accessory_manager.previous_accessory()
+
+        self.sidebar.select_accessory(index)
+
+    def next_accessory(self, event=None):
+
+        index = self.accessory_manager.next_accessory()
+
+        self.sidebar.select_accessory(index)
 
     # ===
     # Stage 3.8
