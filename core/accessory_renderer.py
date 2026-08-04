@@ -610,7 +610,7 @@ class AccessoryRenderer:
         )
 
         geometry = {
-            "width": int(face_width * 2.6)
+            "width": int(face_width * 2.2)
         }
 
         accessory = self.scale_accessory(
@@ -628,9 +628,14 @@ class AccessoryRenderer:
             angle
         )
 
+        center = (
+            (anchors["left_eye"][0] + anchors["right_eye"][0]) // 2,
+            (anchors["left_eye"][1] + anchors["right_eye"][1]) // 2
+        )
+
         position = self.calculate_position(
             accessory,
-            anchors["nose"],
+            center,
             offset_y=10
         )
 

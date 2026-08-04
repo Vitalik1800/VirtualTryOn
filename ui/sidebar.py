@@ -80,7 +80,8 @@ class Sidebar(ctk.CTkFrame):
             values=[
                 "Glasses",
                 "Hats",
-                "Earrings"
+                "Earrings",
+                "Masks"
             ],
             width=200,
             command=self.callback

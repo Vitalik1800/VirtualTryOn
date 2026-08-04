@@ -111,3 +111,21 @@ class Toolbar(ctk.CTkFrame):
             padx=(0, 20),
             pady=15
         )
+
+        # ===
+        # Stage 8.6
+        # Save Photo button
+        # ===
+
+        self.save_button = ctk.CTkButton(
+            self,
+            text="Save",
+            width=90
+        )
+
+        self.save_button.grid(
+            row=0,
+            column=5,
+            padx=20,
+            pady=15
+        )

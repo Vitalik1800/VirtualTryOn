@@ -23,6 +23,7 @@ from core.image_manager import ImageManager
 from core.face_detector import FaceDetector
 from core.accessory_manager import AccessoryManager
 from core.accessory_renderer import AccessoryRenderer
+from core.photo_manager import PhotoManager
 
 # ===
 # Stage 3.7
@@ -71,6 +72,8 @@ class MainWindow(ctk.CTk):
         self.accessory_renderer = AccessoryRenderer()
 
         self.is_camera_running = False
+
+        self.photo_manager = PhotoManager()
 
         # ===
         # Stage 3.5
@@ -190,6 +193,10 @@ class MainWindow(ctk.CTk):
 
         self.toolbar.stop_button.configure(
             command=self.stop_camera
+        )
+
+        self.toolbar.save_button.configure(
+            command=self.save_photo
         )
 
         # Sidebar
@@ -316,6 +323,8 @@ class MainWindow(ctk.CTk):
                 path
             )
 
+            self.photo_manager.update_frame(frame.copy())
+
             image = ImageManager.frame_to_photo(
                 frame,
                 (
@@ -420,6 +429,10 @@ class MainWindow(ctk.CTk):
             state=state
         )
 
+        self.toolbar.save_button.configure(
+            state=state
+        )
+
     def change_accessory(self, index):
         self.accessory_manager.select_accessory(index)
 
@@ -448,6 +461,56 @@ class MainWindow(ctk.CTk):
         index = self.accessory_manager.next_accessory()
 
         self.sidebar.select_accessory(index)
+
+    # ===
+    # Stage 8.6
+    # Save photo
+    # ===
+
+    def save_photo(self):
+        """
+        Save current camera frame.
+        """
+
+        if not self.is_camera_running:
+
+            self.show_error(
+                "Save Error",
+                "Camera is not running."
+            )
+
+            return
+
+        if not self.photo_manager.has_frame():
+
+            self.show_error(
+                "Save Error",
+                "No frame available."
+            )
+
+            return
+
+        if not self.photo_manager.has_save_directory():
+
+            self.photo_manager.select_directory()
+
+            if not self.photo_manager.has_save_directory():
+                return
+
+        saved_path = self.photo_manager.save_photo()
+
+        if saved_path:
+
+            self.status_bar.set_status(
+                "Photo saved successfully."
+            )
+
+        else:
+
+            self.show_error(
+                "Save Error",
+                "Unable to save photo."
+            )
 
     # ===
     # Stage 3.8
@@ -487,6 +550,9 @@ class MainWindow(ctk.CTk):
 
         if hasattr(self, "accessory_renderer"):
             self.accessory_renderer.close()
+
+        if hasattr(self, "photo_manager"):
+            self.photo_manager.close()
             
         # Destroy application window
         
