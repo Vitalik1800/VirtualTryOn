@@ -62,7 +62,7 @@ class Toolbar(ctk.CTkFrame):
         self.logo_label.grid(
             row=0,
             column=0,
-            padx=(20, 10),
+            padx=(PADDING_LARGE, PADDING),
             pady=15
         )
 
@@ -77,7 +77,7 @@ class Toolbar(ctk.CTkFrame):
         self.title_label.grid(
             row=0,
             column=1,
-            padx=(0, 20)
+            padx=(0, PADDING_LARGE)
         )
 
         # Start button
@@ -85,13 +85,16 @@ class Toolbar(ctk.CTkFrame):
         self.start_button = ctk.CTkButton(
             self,
             text="Start Camera",
-            width=140
+            width=BUTTON_WIDTH,
+            height=BUTTON_HEIGHT,
+            corner_radius=BUTTON_CORNER_RADIUS,
+            font=BUTTON_FONT
         )
 
         self.start_button.grid(
             row=0,
             column=3,
-            padx=10,
+            padx=PADDING,
             pady=15
         )
 
@@ -100,15 +103,18 @@ class Toolbar(ctk.CTkFrame):
         self.stop_button = ctk.CTkButton(
             self,
             text="Stop Camera",
-            width=140,
+            width=BUTTON_WIDTH,
+            height=BUTTON_HEIGHT,
+            corner_radius=BUTTON_CORNER_RADIUS,
+            font=BUTTON_FONT,
             fg_color=ERROR_COLOR,
-            hover_color="#B91C1C"
+            hover_color=HOVER_COLOR_ERROR
         )
 
         self.stop_button.grid(
             row=0,
             column=4,
-            padx=(0, 20),
+            padx=(0, PADDING),
             pady=15
         )
 
@@ -120,12 +126,15 @@ class Toolbar(ctk.CTkFrame):
         self.save_button = ctk.CTkButton(
             self,
             text="Save",
-            width=90
+            width=BUTTON_WIDTH,
+            height=BUTTON_HEIGHT,
+            corner_radius=BUTTON_CORNER_RADIUS,
+            font=BUTTON_FONT
         )
 
         self.save_button.grid(
             row=0,
             column=5,
-            padx=20,
+            padx=PADDING_LARGE,
             pady=15
         )

@@ -15,6 +15,22 @@
 
 import customtkinter as ctk
 
+BUTTON_WIDTH = 140
+BUTTON_HEIGHT = 38
+BUTTON_CORNER_RADIUS = 8
+
+BUTTON_FONT = (
+    "Segoe UI",
+    14,
+    "bold"
+)
+
+PADDING_LARGE = 20
+PADDING = 10
+PADDING_SMALL = 5
+
+SIDEBAR_WIDTH = 300
+
 # ===
 # Stage 2.2
 # Appearance
@@ -69,6 +85,9 @@ FRAME_COLOR = "#303030"
 
 TEXT_LIGHT = "#FFFFFF"
 TEXT_DARK = "#1F2937"
+
+HOVER_COLOR = "#1E88E5"
+HOVER_COLOR_ERROR = "#B91C1C"
 
 # ===
 # Stage 2.2

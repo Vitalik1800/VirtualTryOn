@@ -29,6 +29,8 @@ from core.video_manager import VideoManager
 import cv2
 import time
 import gc
+import os
+from ui.tooltip import ToolTip
 
 # ===
 # Stage 3.7
@@ -97,6 +99,8 @@ class MainWindow(ctk.CTk):
         # Register keyboard shortcuts
         # ===
 
+        self.bind("<F1>", self.show_shortcuts)
+        self.bind("<F2>", self.show_about)
         self.bind("<F5>", self.start_camera)
         self.bind("<Escape>", self.stop_camera)
         self.bind("<Control-q>", self.close_application)
@@ -119,6 +123,32 @@ class MainWindow(ctk.CTk):
 
         self.fps = 0
 
+    def show_shortcuts(self, event=None):
+
+        messagebox.showinfo(
+            "Keyboard Shortcuts",
+            "F1       Help\n"
+            "F2       About\n"
+            "F5       Start Camera\n"
+            "Esc      Stop Camera\n"
+            "← / →    Change Accessory\n"
+            "Ctrl+Q   Exit"
+        )
+
+    def show_about(self, event=None):
+
+        messagebox.showinfo(
+            f"About {APP_NAME}",
+            f"{APP_NAME}\n"
+            f"Version {APP_VERSION}\n\n"
+            "Developed by Vitaly Semchyshyn\n\n"
+            "Technologies:\n"
+            "• Python\n"
+            "• OpenCV\n"
+            "• MediaPipe\n"
+            "• CustomTkinter"
+        )
+        
     # ===
     # Stage 2.1
     # Configure application window
@@ -131,6 +161,9 @@ class MainWindow(ctk.CTk):
         self.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}")
 
         self.minsize(MIN_WIDTH, MIN_HEIGHT)
+
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
         self.center_window(WINDOW_WIDTH, WINDOW_HEIGHT)
 
@@ -213,6 +246,10 @@ class MainWindow(ctk.CTk):
             command=self.save_photo
         )
 
+        ToolTip(self.toolbar.start_button, "Start camera (F5)")
+        ToolTip(self.toolbar.stop_button, "Stop camera (Esc)")
+        ToolTip(self.toolbar.save_button, "Save photo")
+
         # Sidebar
 
         self.sidebar = Sidebar(
@@ -237,8 +274,8 @@ class MainWindow(ctk.CTk):
         self.camera_preview.grid(
             row=1,
             column=1,
-            padx=20,
-            pady=20,
+            padx=PADDING_LARGE,
+            pady=PADDING_LARGE,
             sticky="nsew"
         )
 
@@ -266,13 +303,18 @@ class MainWindow(ctk.CTk):
         if self.is_camera_running:
             return
 
+        self.status_bar.set_status("Starting camera...")
+        self.update_idletasks()
+
         if self.camera.open():
 
             self.is_camera_running = True
 
             self.update_controls()
 
-            self.status_bar.set_status("Camera Started")
+            self.status_bar.set_status(
+                "Camera Started. Recording..."
+            )
             self.status_bar.set_camera_status("Connected")
 
             if not self.video_manager.has_save_directory():
@@ -280,6 +322,7 @@ class MainWindow(ctk.CTk):
                 self.video_manager.select_directory()
 
                 if not self.video_manager.has_save_directory():
+                    self.stop_camera()
                     return
 
             output_path = self.video_manager.create_output_path()
@@ -303,16 +346,13 @@ class MainWindow(ctk.CTk):
             ):
                 self.show_error(
                     "Video Error",
-                    "Unable to start video recording."
+                    "Unable to record video.\n\n"
+                    "Please choose another folder or check write permissions."
                 )
 
                 self.stop_camera()
 
                 return
-
-            self.status_bar.set_status(
-                "Recording started."
-            )
 
             self.last_time = time.perf_counter()
             
@@ -355,7 +395,11 @@ class MainWindow(ctk.CTk):
 
                 self.show_error(
                     "Camera Error",
-                    "Failed to read video frame."
+                    "Unable to access the camera.\n\n"
+                    "Please make sure that:\n"
+                    "• the camera is connected;\n"
+                    "• it is not being used by another application;\n"
+                    "• camera permissions are enabled."
                 )
 
                 return
@@ -474,7 +518,7 @@ class MainWindow(ctk.CTk):
             self.video_manager.stop_recording()
 
             self.status_bar.set_status(
-                "Video saved successfully."
+                "Video recording completed."
             )
 
             self.after(
@@ -542,21 +586,74 @@ class MainWindow(ctk.CTk):
         )
 
     def change_accessory(self, index):
+
         self.accessory_manager.select_accessory(index)
 
+        path = self.accessory_manager.get_current_path()
+
+        if path:
+            name = os.path.splitext(
+                os.path.basename(path)
+            )[0]
+
+            self.status_bar.set_status(
+                f"Accessory: {name}"
+            )
+
+        else:
+
+            self.status_bar.set_status(
+                "Accessory file not found."
+            )
+
+            return
+            
+            
     def change_category(self, value):
 
-        if self.accessory_manager.select_category(value.lower()):
+        self.status_bar.set_status(
+            "Loading accessories..."
+        )
+        self.update_idletasks()
 
-            accessories = (
-                self.accessory_manager.current_accessories
+        try:
+
+            if self.accessory_manager.select_category(value.lower()):
+
+                accessories = (
+                    self.accessory_manager.current_accessories
+                )
+
+                if not accessories:
+
+                    self.sidebar.update_accessories([])
+
+                    self.status_bar.set_status(
+                        "No accessories available."
+                    )
+
+                    return
+
+                self.sidebar.update_accessories(
+                    accessories
+                )
+
+                self.sidebar.select_accessory(0)
+
+                self.status_bar.set_status(
+                    f"Category: {value.title()}"
+                )
+
+        except FileNotFoundError as e:
+
+            self.status_bar.set_status(
+                "Accessory folder not found."
             )
 
-            self.sidebar.update_accessories(
-                accessories
+            self.show_error(
+                "Folder Missing",
+                f"Folder not found:\n\n{e}"
             )
-
-            self.sidebar.select_accessory(0)
 
     def previous_accessory(self, event=None):
 
@@ -617,7 +714,11 @@ class MainWindow(ctk.CTk):
 
             self.show_error(
                 "Save Error",
-                "Unable to save photo."
+                "Unable to save the photo.\n\n"
+                "Please check:\n"
+                "• the selected folder exists;\n"
+                "• you have write permission;\n"
+                "• enough disk space is available."
             )
 
     # ===

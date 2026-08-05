@@ -208,7 +208,12 @@ class AccessoryManager:
         )
 
         if not os.path.isdir(folder):
-            return []
+
+            logger.error(
+                f"Accessory folder not found: {folder}"
+            )
+
+            raise FileNotFoundError(folder)
 
         accessories = []
 
@@ -293,9 +298,7 @@ class AccessoryManager:
         if not self.current_accessories:
             return None
 
-        path = self.current_accessories[
-            self.current_index
-        ]
+        path = self.current_accessories[self.current_index]
 
         return self.get_accessory(path)
 
@@ -357,19 +360,6 @@ class AccessoryManager:
         self.get_current_accessory()
 
         return self.current_index
-
-    # ===
-    # Stage 7.4
-    # Clear current accessory
-    # ===
-    def clear_selection(self):
-        """
-        Clear current accessory.
-        """
-
-        self.current_accessory = None
-        self.current_path = None
-        self.current_index = -1
 
     # ===
     # Stage 5.8

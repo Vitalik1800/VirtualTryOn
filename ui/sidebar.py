@@ -48,7 +48,7 @@ class Sidebar(ctk.CTkFrame):
     def configure_sidebar(self):
 
         self.configure(
-            width=260,
+            width=SIDEBAR_WIDTH,
             corner_radius=0
         )
 
@@ -70,7 +70,7 @@ class Sidebar(ctk.CTkFrame):
         )
 
         self.title_label.pack(
-            pady=(20, 10)
+            pady=(PADDING_LARGE, PADDING)
         )
 
         # Category selection
@@ -80,15 +80,14 @@ class Sidebar(ctk.CTkFrame):
             values=[
                 "Glasses",
                 "Hats",
-                "Earrings",
                 "Masks"
             ],
-            width=200,
+            width=SIDEBAR_WIDTH,
             command=self.callback
         )
 
         self.category_menu.pack(
-            pady=(10, 20)
+            pady=(PADDING, PADDING_LARGE)
         )
 
         # Accessories label
@@ -112,8 +111,8 @@ class Sidebar(ctk.CTkFrame):
         )
 
         self.accessory_list.pack(
-            pady=10,
-            padx=10,
+            pady=PADDING,
+            padx=PADDING,
             fill="both",
             expand=True
         )

@@ -95,7 +95,21 @@ class AccessoryRenderer:
             image = self.trim_transparent(image)
 
             if image is None:
-                return None
+
+                logger.error(
+                    "Cannot load accessory: %s",
+                    path
+                )
+
+                return frame
+
+            if image.shape[2] != 4:
+
+                logger.warning(
+                    "Accessory has no alpha channel."
+                )
+
+                return frame
 
             self.cache[accessory_path] = image
 
