@@ -16,6 +16,10 @@
 import mediapipe as mp
 import cv2
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 # ===
 # Stage 4.1
 # Face Detector
@@ -48,6 +52,8 @@ class FaceDetector:
         # ===
 
         self.last_results = None
+
+        self.frame_counter = 0
 
     # ===
     # Stage 4.11
@@ -86,7 +92,7 @@ class FaceDetector:
 
             # Enable iris landmarks
 
-            refine_landmarks=True,
+            refine_landmarks=False,
 
             # Detection confidence
 
@@ -117,6 +123,9 @@ class FaceDetector:
 
             self.last_results = None
             
+            return None
+
+        if frame.size == 0:
             return None
 
         # Convert BGR to RGB
@@ -403,9 +412,17 @@ class FaceDetector:
         """
 
         if frame is None:
-            return []
+            return None
 
-        results = self.detect(frame)
+        if frame.size == 0:
+            return None
+
+        self.frame_counter += 1
+
+        if self.frame_counter % 2 == 0:
+            results = self.detect(frame)
+        else:
+            results = self.last_results
 
         return self.get_landmark_points(
             results,

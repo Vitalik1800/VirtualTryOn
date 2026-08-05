@@ -63,7 +63,9 @@ class Camera:
 
         if not self.capture.isOpened():
 
-            logging.error("Camera initialization failed.")
+            logger.exception(
+                "Cannot initialize camera."
+            )
             
             return False
 
@@ -93,6 +95,8 @@ class Camera:
         fps = int(
             self.capture.get(cv2.CAP_PROP_FPS)
         )
+
+        print(f"Camera FPS: {fps}")
 
         logger.info(
             f"Camera initialized: {width}x{height} @ {fps} FPS"

@@ -18,6 +18,10 @@ import cv2
 from PIL import Image
 from PIL import ImageTk
 
+import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 class ImageManager:
     """
@@ -26,6 +30,8 @@ class ImageManager:
 
     @staticmethod
     def frame_to_photo(frame, size=None):
+
+        start = time.perf_counter()
 
         if frame is None:
             return None
@@ -41,6 +47,11 @@ class ImageManager:
 
         if size is not None:
 
-            image = image.resize(size)
+            image = image.resize(
+                size,
+                Image.Resampling.BILINEAR
+            )
 
-        return ImageTk.PhotoImage(image)
+        photo = ImageTk.PhotoImage(image)
+
+        return photo

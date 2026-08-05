@@ -137,34 +137,6 @@ class VideoManager:
         return True
 
     # ===
-    # Stage 9.3
-    # Create output path
-    # ===
-
-    def create_output_path(self):
-        """
-        Create output path for video recording.
-        """
-
-        self.save_directory = "videos"
-
-        os.makedirs(
-            self.save_directory,
-            exist_ok=True
-        )
-
-        filename = datetime.now().strftime(
-            "video_%Y%m%d_%H%M%S.mp4"
-        )
-
-        self.output_path = os.path.join(
-            self.save_directory,
-            filename
-        )
-
-        return self.output_path
-
-    # ===
     # Stage 9.5
     # Stop video recording
     # ===
@@ -211,9 +183,13 @@ class VideoManager:
 
         except Exception as error:
 
-            logger.error(error)
+            logger.exception(
+                "Failed to write video frame."
+            )
 
             self.stop_recording()
+
+            return False
 
     # ===
     # Stage 9.6

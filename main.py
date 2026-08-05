@@ -14,6 +14,20 @@
 # ===
 
 from ui.main_window import MainWindow
+import logging
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+    handlers=[
+        logging.FileHandler(
+            "virtual_try_on.log",
+            encoding="utf-8"
+        ),
+        logging.StreamHandler()
+    ]
+)
 
 # ===
 # Stage 2.1

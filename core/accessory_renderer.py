@@ -16,6 +16,11 @@
 import math
 import cv2
 import os
+import time
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 # ===
 # Stage 6.3
@@ -50,9 +55,6 @@ RIGHT_EAR = 454
 GLASSES = "glasses"
 HAT = "hats"
 MASK = "masks"
-EARRINGS = "earrings"
-NECKLACE = "necklaces"
-WATCH = "watches"
 
 # ===
 # Stage 6.1
@@ -71,6 +73,33 @@ class AccessoryRenderer:
 
         self.scaled_cache = {}
         self.rotated_cache = {}
+        self.cache = {}
+        self.profile_enabled = True
+        self.profile_counter = 0
+
+    def get_cached_accessory(self, accessory_path):
+        """
+        Load accessory only once.
+        """
+
+        if accessory_path is None:
+            return None
+
+        if accessory_path not in self.cache:
+
+            image = cv2.imread(
+                accessory_path,
+                cv2.IMREAD_UNCHANGED
+            )
+
+            image = self.trim_transparent(image)
+
+            if image is None:
+                return None
+
+            self.cache[accessory_path] = image
+
+        return self.cache[accessory_path]
 
     # ===
     # Stage 6.1
@@ -97,10 +126,6 @@ class AccessoryRenderer:
         """
         try:
 
-            scale = 2.2
-            offset_x = 0
-            offset_y = 0
-
             if (
                 frame is None
                 or accessory is None
@@ -108,19 +133,39 @@ class AccessoryRenderer:
             ):
                 return frame
 
-            anchors = self.get_anchor_points(
-                landmarks
-            )
+            anchors = self.get_anchor_points(landmarks)
+
+            if anchors is None:
+                return frame
 
             if (
-                anchors["left_eye"] is None
-                or anchors["right_eye"] is None
+                anchors["left_eye"] is None or
+                anchors["right_eye"] is None
             ):
                 return frame
 
+            face_width = abs(
+                anchors["right_eye"][0] -
+                anchors["left_eye"][0]
+            )
+
+            angle = self.calculate_angle(
+                anchors["left_eye"],
+                anchors["right_eye"]
+            )
+
+            eye_center = (
+                (anchors["left_eye"][0] + anchors["right_eye"][0]) // 2,
+                (anchors["left_eye"][1] + anchors["right_eye"][1]) // 2
+            )
+            
             # Face width
             
             accessory_type = self.get_accessory_type(accessory_path)
+
+            accessory = self.get_cached_accessory(
+                accessory_path
+            )
 
             if accessory_type is None:
                 return frame
@@ -129,104 +174,40 @@ class AccessoryRenderer:
                 return self.render_glasses(
                     frame,
                     accessory,
-                    anchors
+                    accessory_path,
+                    face_width,
+                    angle,
+                    eye_center
                 )
 
             elif accessory_type == HAT:
                 return self.render_hat(
                     frame,
                     accessory,
-                    anchors
+                    anchors,
+                    accessory_path,
+                    face_width,
+                    angle
                 )
             
             elif accessory_type == MASK:
                 return self.render_mask(
                     frame,
                     accessory,
-                    anchors
+                    accessory_path,
+                    face_width,
+                    angle,
+                    eye_center
                 )
-
-            elif accessory_type == EARRINGS:
-                return self.render_earrings(
-                    frame,
-                    accessory,
-                    anchors
-                )
-
-            elif accessory_type == NECKLACE:
-                return self.render_necklace(
-                    frame,
-                    accessory,
-                    anchors
-                )
-
-            elif accessory_type == WATCH:
-                return self.render_watch(
-                    frame,
-                    accessory,
-                    anchors
-                )
-
+            
             return frame
-
-            geometry = {
-                "width": int(face_width * 2.2)
-            }
-
-            key = (
-                accessory_path,
-                geometry["width"]
-            )
-
-            if key in self.scaled_cache:
-                accessory = self.scaled_cache[key]
-            else:
-                accessory = self.scale_accessory(
-                    accessory,
-                    geometry
-                )
-                self.scaled_cache[key] = accessory
-
-            if accessory.size == 0:
-                return frame
-
-            angle = round(
-                self.calculate_angle(
-                    anchors["left_eye"],
-                    anchors["right_eye"]
-                )
-            )
-
-            key = (
-                accessory_path,
-                geometry["width"],
-                angle
-            )
-
-            if key in self.rotated_cache:
-                accessory = self.rotated_cache[key]
-            else:
-                accessory = self.rotate_accessory(
-                    accessory,
-                    angle
-                )
-                self.rotated_cache[key] = accessory
-
-            position = self.calculate_position(
-                accessory,
-                anchor,
-                offset_y=-accessory.shape[0] // 6
-            )
-
-            return self.alpha_blend(
-                frame,
-                accessory,
-                position
-            )
 
         except Exception as error:
 
-            print(f"[AccessoryRenderer] {error}")
+            logger.error(
+                "Accessory rendering failed: %s",
+                error
+            )
             return frame
 
     # ===
@@ -302,8 +283,8 @@ class AccessoryRenderer:
         """
 
         if accessory is None:
-            print("Error: Accessory image not loaded.")
-            return frame
+            logger.error("Accessory image not loaded.")
+            return accessory
 
         if face_geometry is None:
             return accessory
@@ -326,10 +307,16 @@ class AccessoryRenderer:
             target_width * aspect_ratio
         )
 
+        interpolation = (
+            cv2.INTER_LINEAR
+            if target_width > width
+            else cv2.INTER_AREA
+        )
+
         resized = cv2.resize(
             accessory,
             (target_width, target_height),
-            interpolation=cv2.INTER_AREA
+            interpolation=interpolation
         )
 
         return resized
@@ -361,8 +348,8 @@ class AccessoryRenderer:
         """
 
         if accessory is None:
-            print("Error: Accessory image not loaded.")
-            return frame
+            logger.error("Error: Accessory image not loaded.")
+            return None
 
         if anchor_point is None:
             return None
@@ -441,8 +428,8 @@ class AccessoryRenderer:
         """
 
         if accessory is None:
-            print("Error: Accessory image not loaded.")
-            return frame
+            logger.error("Error: Accessory image not loaded.")
+            return None
 
         height, width = accessory.shape[:2]
 
@@ -465,6 +452,52 @@ class AccessoryRenderer:
             borderMode=cv2.BORDER_CONSTANT,
             borderValue=(0, 0, 0, 0)
         )
+
+        return rotated
+
+    def get_transformed_accessory(
+        self,
+        accessory,
+        accessory_path,
+        width,
+        angle
+    ):
+        """
+        Return cached scaled and rotated accessory.
+        """
+
+        width = round(width / 32) * 32
+        angle = round(angle / 20) * 20
+
+        scale_key = (
+            accessory_path,
+            width
+        )
+
+        if scale_key in self.scaled_cache:
+            scaled = self.scaled_cache[scale_key]
+        else:
+            scaled = self.scale_accessory(
+                accessory,
+                {"width": width}
+            )
+            self.scaled_cache[scale_key] = scaled
+
+        rotate_key = (
+            accessory_path,
+            width,
+            angle
+        )
+
+        if rotate_key in self.rotated_cache:
+            return self.rotated_cache[rotate_key]
+
+        rotated = self.rotate_accessory(
+            scaled,
+            angle
+        )
+
+        self.rotated_cache[rotate_key] = rotated
 
         return rotated
 
@@ -532,8 +565,7 @@ class AccessoryRenderer:
             acc_x1:acc_x2
         ]
 
-        alpha = accessory_crop[:, :, 3] / 255.0
-        alpha = alpha[:, :, None]
+        alpha = accessory_crop[:, :, 3:4].astype("float32") / 255.0
 
         frame_crop = frame[
             y1:y2,
@@ -548,29 +580,22 @@ class AccessoryRenderer:
 
         return frame
 
-    def render_hat(self, frame, accessory, anchors):
+    def render_hat(
+        self,
+        frame,
+        accessory,
+        anchors,
+        accessory_path,
+        face_width,
+        angle
+    ):
 
-        accessory = self.trim_transparent(accessory)
+        width = int(face_width * 3.4)
 
-        face_width = abs(
-            anchors["right_eye"][0] -
-            anchors["left_eye"][0]
-        )
-
-        accessory = self.scale_accessory(
+        accessory = self.get_transformed_accessory(
             accessory,
-            {
-                "width": int(face_width * 3.4)
-            }
-        )
-
-        angle = self.calculate_angle(
-            anchors["left_eye"],
-            anchors["right_eye"]
-        )
-
-        accessory = self.rotate_accessory(
-            accessory,
+            accessory_path,
+            width,
             angle
         )
 
@@ -602,40 +627,28 @@ class AccessoryRenderer:
             position
         )
 
-    def render_mask(self, frame, accessory, anchors):
+    def render_mask(
+        self,
+        frame,
+        accessory,
+        accessory_path,
+        face_width,
+        angle,
+        eye_center
+    ):
 
-        face_width = abs(
-            anchors["right_eye"][0] -
-            anchors["left_eye"][0]
-        )
+        width = int(face_width * 2.2)
 
-        geometry = {
-            "width": int(face_width * 2.2)
-        }
-
-        accessory = self.scale_accessory(
+        accessory = self.get_transformed_accessory(
             accessory,
-            geometry
-        )
-
-        angle = self.calculate_angle(
-            anchors["left_eye"],
-            anchors["right_eye"]
-        )
-
-        accessory = self.rotate_accessory(
-            accessory,
+            accessory_path,
+            width,
             angle
-        )
-
-        center = (
-            (anchors["left_eye"][0] + anchors["right_eye"][0]) // 2,
-            (anchors["left_eye"][1] + anchors["right_eye"][1]) // 2
         )
 
         position = self.calculate_position(
             accessory,
-            center,
+            eye_center,
             offset_y=10
         )
 
@@ -645,114 +658,28 @@ class AccessoryRenderer:
             position
         )
 
-    def render_earrings(self, frame, accessory, anchors):
+    def render_glasses(
+        self,
+        frame,
+        accessory,
+        accessory_path,
+        face_width,
+        angle,
+        eye_center
+    ):
 
-        accessory = self.trim_transparent(accessory)
+        width = int(face_width * 2.2)
 
-        geometry = {
-            "width": 70
-        }
-
-        accessory = self.scale_accessory(
+        accessory = self.get_transformed_accessory(
             accessory,
-            geometry
-        )
-
-        left_anchor, right_anchor = self.get_earring_anchors(
-            anchors
-        )
-
-        left_position = self.calculate_position(
-            accessory,
-            left_anchor
-        )
-
-        right_position = self.calculate_position(
-            accessory,
-            right_anchor
-        )
-
-        frame = self.alpha_blend(
-            frame,
-            accessory,
-            left_position
-        )
-
-        frame = self.alpha_blend(
-            frame,
-            accessory,
-            right_position
-        )
-
-        return frame
-
-    def render_watch(self, frame, accessory, anchors):
-        """
-        Watches require hand tracking.
-        """
-
-        return frame
-
-    def render_necklace(self, frame, accessory, anchors):
-
-        geometry = {
-            "width": 260
-        }
-
-        accessory = self.scale_accessory(
-            accessory,
-            geometry
-        )
-
-        position = self.calculate_position(
-            accessory,
-            anchors["chin"],
-            offset_y=15,
-            align="top"
-        )
-
-        return self.alpha_blend(
-            frame,
-            accessory,
-            position
-        )
-
-    def render_glasses(self, frame, accessory, anchors):
-
-        accessory = self.trim_transparent(accessory)
-
-        face_width = abs(
-            anchors["right_eye"][0] -
-            anchors["left_eye"][0]
-        )
-
-        geometry = {
-            "width": int(face_width * 2.2)
-        }
-
-        accessory = self.scale_accessory(
-            accessory,
-            geometry
-        )
-
-        angle = self.calculate_angle(
-            anchors["left_eye"],
-            anchors["right_eye"]
-        )
-
-        accessory = self.rotate_accessory(
-            accessory,
+            accessory_path,
+            width,
             angle
         )
 
-        center = (
-            (anchors["left_eye"][0] + anchors["right_eye"][0]) // 2,
-            (anchors["left_eye"][1] + anchors["right_eye"][1]) // 2
-        )
-
         position = self.calculate_position(
             accessory,
-            center,
+            eye_center,
             offset_y=-accessory.shape[0] // 10
         )
 
@@ -774,12 +701,12 @@ class AccessoryRenderer:
         """
 
         if accessory is None:
-            print("Error: Accessory image not loaded.")
-            return frame
+            logger.error("Error: Accessory image not loaded.")
+            return None
 
         if len(accessory.shape) != 3 or accessory.shape[2] != 4:
-            print("Error: Accessory must be RGBA.")
-            return frame
+            logger.error("Error: Accessory must be RGBA.")
+            return None
 
         alpha = accessory[:, :, 3]
 
@@ -841,6 +768,7 @@ class AccessoryRenderer:
 
         self.scaled_cache.clear()
         self.rotated_cache.clear()
+        self.cache.clear()
 
     def close(self):
         """

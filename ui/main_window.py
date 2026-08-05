@@ -13,6 +13,7 @@
 # Import libraries
 # ===
 
+from core.settings import *
 from ui.theme import *
 from ui.toolbar import Toolbar
 from ui.sidebar import Sidebar
@@ -27,6 +28,7 @@ from core.photo_manager import PhotoManager
 from core.video_manager import VideoManager
 import cv2
 import time
+import gc
 
 # ===
 # Stage 3.7
@@ -34,6 +36,9 @@ import time
 # ===
 
 from tkinter import messagebox
+import logging
+
+logger = logging.getLogger(__name__)
 
 # ===
 # Stage 2.1
@@ -111,6 +116,8 @@ class MainWindow(ctk.CTk):
         self.update_controls()
 
         self.last_time = time.perf_counter()
+
+        self.fps = 0
 
     # ===
     # Stage 2.1
@@ -342,7 +349,7 @@ class MainWindow(ctk.CTk):
 
             success, frame = self.camera.read()
 
-            if not success:
+            if not success or frame is None:
 
                 self.stop_camera()
 
@@ -357,11 +364,15 @@ class MainWindow(ctk.CTk):
 
             delta = current - self.last_time
 
-            if delta > 0:
-                fps = 1.0 / delta
-                self.status_bar.set_fps(int(fps))
-
             self.last_time = current
+
+            if delta > 0:
+
+                current_fps = 1.0 / delta
+
+                self.fps = self.fps * 0.9 + current_fps * 0.1
+
+                self.status_bar.set_fps(round(self.fps))
                         
             # ===
             # Stage 6.2
@@ -381,9 +392,10 @@ class MainWindow(ctk.CTk):
                 path
             )
 
-            self.video_manager.write(frame)
+            if self.video_manager.is_recording:
+                self.video_manager.write(frame)
 
-            self.photo_manager.update_frame(frame.copy())
+            self.photo_manager.update_frame(frame)
 
             image = ImageManager.frame_to_photo(
                 frame,
@@ -403,21 +415,33 @@ class MainWindow(ctk.CTk):
 
             self.camera_preview.preview_label.image = image
 
-            if self.is_camera_running:
+            if self.is_camera_running and self.winfo_exists():
+                
+                processing_time = (time.perf_counter() - current) * 1000
+
+                delay = max(
+                    1,
+                    int(1000 / FPS_LIMIT - processing_time)
+                )
+
                 self.camera_job = self.after(
-                    15,
+                    delay,
                     self.update_camera
                 )
 
-        except Exception as error:
+        except Exception:
+
+            logger.exception(
+                "Camera update failed."
+            )
 
             self.stop_camera()
 
             self.show_error(
                 "Unexpected Error",
-                str(error)
+                "Unexpected error occurred."
             )
-        
+                
     # ===
     # Stage 3.5
     # Stop camera
@@ -603,6 +627,12 @@ class MainWindow(ctk.CTk):
 
     def close_application(self, event=None):
 
+        gc.collect()
+
+        logger.info(
+            "All resources released successfully."
+        )
+
         # Stop camera loop
 
         self.is_camera_running = False
@@ -626,20 +656,21 @@ class MainWindow(ctk.CTk):
         # Clear preview
         # ===
 
-        if hasattr(self, "face_detector"):
-            self.face_detector.close()
+        self.face_detector.close()
 
-        if hasattr(self, "accessory_manager"):
-            self.accessory_manager.close()
+        self.accessory_manager.close()
 
-        if hasattr(self, "accessory_renderer"):
-            self.accessory_renderer.close()
+        self.accessory_renderer.close()
 
-        if hasattr(self, "photo_manager"):
-            self.photo_manager.close()
+        self.photo_manager.close()
 
-        if hasattr(self, "video_manager"):
-            self.video_manager.close()
+        self.video_manager.close()
+
+        self.camera = None
+        self.face_detector = None
+        self.accessory_renderer = None
+        self.photo_manager = None
+        self.video_manager = None
             
         # Destroy application window
         

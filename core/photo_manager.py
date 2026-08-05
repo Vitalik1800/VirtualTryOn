@@ -41,6 +41,7 @@ class PhotoManager:
         )
 
         self.current_frame = None
+        self.save_directory = None
 
     # ===
     # Stage 8.2
@@ -56,7 +57,6 @@ class PhotoManager:
         """
 
         self.current_frame = frame
-        self.save_directory = None
 
     # ===
     # Stage 8.2
@@ -251,6 +251,7 @@ class PhotoManager:
                 )
 
                 return False
+            
         except PermissionError:
 
             logger.error(
@@ -259,9 +260,11 @@ class PhotoManager:
 
             return False
 
-        except Exception as error:
+        except Exception:
 
-            logger.exception(error)
+            logger.exception(
+                "Failed to save photo."
+            )
 
             return False
 
