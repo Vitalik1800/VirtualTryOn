@@ -419,7 +419,11 @@ class FaceDetector:
 
         self.frame_counter += 1
 
-        if self.frame_counter % 2 == 0:
+        if (
+            self.last_results is None
+            or
+            self.frame_counter % 2 == 0
+        ):
             results = self.detect(frame)
         else:
             results = self.last_results

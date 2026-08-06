@@ -33,7 +33,10 @@ class ImageManager:
 
         start = time.perf_counter()
 
-        if frame is None:
+        if (
+            frame is None
+            or frame.size == 0
+        ):
             return None
 
         # BGR -> RGB

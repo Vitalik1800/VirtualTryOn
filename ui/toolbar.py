@@ -88,7 +88,9 @@ class Toolbar(ctk.CTkFrame):
             width=BUTTON_WIDTH,
             height=BUTTON_HEIGHT,
             corner_radius=BUTTON_CORNER_RADIUS,
-            font=BUTTON_FONT
+            font=BUTTON_FONT,
+            fg_color=SUCCESS_COLOR,
+            hover_color=SUCCESS_HOVER_COLOR
         )
 
         self.start_button.grid(
@@ -108,7 +110,7 @@ class Toolbar(ctk.CTkFrame):
             corner_radius=BUTTON_CORNER_RADIUS,
             font=BUTTON_FONT,
             fg_color=ERROR_COLOR,
-            hover_color=HOVER_COLOR_ERROR
+            hover_color=ERROR_HOVER_COLOR
         )
 
         self.stop_button.grid(
@@ -129,12 +131,50 @@ class Toolbar(ctk.CTkFrame):
             width=BUTTON_WIDTH,
             height=BUTTON_HEIGHT,
             corner_radius=BUTTON_CORNER_RADIUS,
-            font=BUTTON_FONT
+            font=BUTTON_FONT,
+            fg_color=PRIMARY_COLOR,
+            hover_color=PRIMARY_HOVER_COLOR
         )
 
         self.save_button.grid(
             row=0,
             column=5,
             padx=PADDING_LARGE,
+            pady=15
+        )
+
+        self.help_button = ctk.CTkButton(
+            self,
+            text="Help",
+            width=BUTTON_WIDTH,
+            height=BUTTON_HEIGHT,
+            corner_radius=BUTTON_CORNER_RADIUS,
+            font=BUTTON_FONT,
+            fg_color=INFO_COLOR,
+            hover_color=INFO_HOVER_COLOR
+        )
+
+        self.help_button.grid(
+            row=0,
+            column=6,
+            padx=(0, PADDING),
+            pady=15
+        )
+        
+        self.about_button = ctk.CTkButton(
+            self,
+            text="About",
+            width=BUTTON_WIDTH,
+            height=BUTTON_HEIGHT,
+            corner_radius=BUTTON_CORNER_RADIUS,
+            font=BUTTON_FONT,
+            fg_color=ABOUT_COLOR,
+            hover_color=ABOUT_HOVER_COLOR
+        )
+
+        self.about_button.grid(
+            row=0,
+            column=7,
+            padx=(0, PADDING),
             pady=15
         )

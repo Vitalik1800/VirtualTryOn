@@ -246,9 +246,26 @@ class MainWindow(ctk.CTk):
             command=self.save_photo
         )
 
+        self.toolbar.help_button.configure(
+            command=self.show_shortcuts
+        )
+
+        self.toolbar.about_button.configure(
+            command=self.show_about
+        )
+
         ToolTip(self.toolbar.start_button, "Start camera (F5)")
         ToolTip(self.toolbar.stop_button, "Stop camera (Esc)")
         ToolTip(self.toolbar.save_button, "Save photo")
+        ToolTip(
+            self.toolbar.help_button,
+            "Keyboard shortcuts (F1)"
+        )
+
+        ToolTip(
+            self.toolbar.about_button,
+            "About application (F2)"
+        )
 
         # Sidebar
 

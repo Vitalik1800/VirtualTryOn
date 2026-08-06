@@ -1,37 +1,50 @@
-"""
-    Project: Virtual Try-On
+import unittest
 
-    Stage: 3
-    Substage: 3.4 - Image Conversion Test
-"""
+import numpy as np
 
-from core.camera import Camera
 from core.image_manager import ImageManager
 
-camera = Camera()
+class TestImageManager(unittest.TestCase):
 
-if camera.open():
+    def setUp(self):
 
-    success, frame = camera.read()
-
-    if success:
-
-        rgb = ImageManager.bgr_to_rgb(frame)
-        pillow = ImageManager.rgb_to_pillow(rgb)
-        image = ImageManager.pillow_to_ctk(
-            pillow,
-            size=(640, 480)
+        self.frame = np.zeros(
+            (480, 640, 3),
+            dtype=np.uint8
         )
 
-        print("Image conversion successful.")
-        print(type(image))
+    # ==========================
+    # Stage 12.7
+    # Invalid frame
+    # ==========================
 
-    else:
+    def test_none_frame(self):
 
-        print("Failed to capture frame.")
+        image = ImageManager.frame_to_photo(
+            None,
+            (640, 480)
+        )
 
-    camera.release()
+        self.assertIsNone(image)
 
-else:
+    # ==========================
+    # Stage 12.7
+    # Empty frame
+    # ==========================
 
-    print("Camera initialization failed.")
+    def test_empty_frame(self):
+
+        frame = np.zeros(
+            (0, 0, 3),
+            dtype=np.uint8
+        )
+
+        image = ImageManager.frame_to_photo(
+            frame,
+            (640, 480)
+        )
+
+        self.assertIsNone(image)
+
+if __name__ == "__main__":
+    unittest.main()

@@ -96,8 +96,6 @@ class Camera:
             self.capture.get(cv2.CAP_PROP_FPS)
         )
 
-        print(f"Camera FPS: {fps}")
-
         logger.info(
             f"Camera initialized: {width}x{height} @ {fps} FPS"
         )

@@ -1,29 +1,76 @@
 """
-    Project: Virtual Try-On
+Project: Virtual Try-On
 
-    Stage: 3
-    Substage: 3.3 - Camera Test
+Stage: 12
+Substage: 12.1 - Camera Tests
+
+Description:
+Unit tests for Camera module.
 """
+
+import unittest
 
 from core.camera import Camera
 
-camera = Camera()
+class TestCamera(unittest.TestCase):
 
-if camera.open():
+    def setUp(self):
+        """Create camera before every test."""
 
-    success, frame = camera.read()
+        self.camera = Camera()
 
-    if success:
+    def tearDown(self):
+        """Release camera after every test."""
 
-        print("Frame captured successfully.")
-        print(frame.shape)
+        if self.camera.is_opened():
+            self.camera.release()
 
-    else:
+    def test_open_camera(self):
+        """Camera should open if available."""
 
-        print("Frame capture failed.")
+        opened = self.camera.open()
 
-    camera.release()
+        self.assertIsInstance(opened, bool)
 
-else:
+    def test_read_frame(self):
+        """Read frame from opened camera."""
 
-    print("Unable to open camera.")
+        if not self.camera.open():
+            self.skipTest("Camera not available.")
+
+        success, frame = self.camera.read()
+
+        self.assertTrue(success)
+        self.assertIsNotNone(frame)
+
+    def test_release_camera(self):
+        """Camera should close correctly."""
+
+        self.camera.open()
+
+        self.camera.release()
+
+        self.assertFalse(
+            self.camera.is_opened()
+        )
+
+    def test_read_widhout_open(self):
+        """Reading without opening camera."""
+
+        success, frame = self.camera.read()
+
+        self.assertFalse(success)
+        self.assertIsNone(frame)
+
+    def test_release_twice(self):
+        """Releasing camera twice should not fail."""
+
+        self.camera.release()
+        self.camera.release()
+
+        self.assertFalse(
+            self.camera.is_opened()
+        )
+
+if __name__ == "__main__":
+    unittest.main()
