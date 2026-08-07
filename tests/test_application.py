@@ -2,10 +2,6 @@ import unittest
 
 from ui.main_window import MainWindow
 
-<<<<<<< HEAD
-=======
-
->>>>>>> d5bf2df (Release v1.0)
 class TestApplicationStartup(unittest.TestCase):
 
     # ==========================
@@ -81,9 +77,6 @@ class TestApplicationStartup(unittest.TestCase):
 
         self.assertTrue(success)
 
-<<<<<<< HEAD
-=======
 
->>>>>>> d5bf2df (Release v1.0)
 if __name__ == "__main__":
     unittest.main()
