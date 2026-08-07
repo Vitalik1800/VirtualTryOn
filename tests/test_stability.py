@@ -5,10 +5,6 @@ import unittest
 
 from ui.main_window import MainWindow
 
-<<<<<<< HEAD
-=======
-
->>>>>>> d5bf2df (Release v1.0)
 class TestStability(unittest.TestCase):
 
     def setUp(self):
@@ -47,10 +43,7 @@ class TestStability(unittest.TestCase):
     def test_camera_restart(self):
 
         for _ in range(10):
-<<<<<<< HEAD
-
-=======
->>>>>>> d5bf2df (Release v1.0)
+=
             self.assertTrue(
                 self.app.camera.open()
             )
@@ -91,10 +84,7 @@ class TestStability(unittest.TestCase):
         for _ in range(20):
 
             for index in range(count):
-<<<<<<< HEAD
 
-=======
->>>>>>> d5bf2df (Release v1.0)
                 self.assertTrue(
                     self.app.accessory_manager.select_accessory(
                         index
@@ -161,10 +151,7 @@ class TestStability(unittest.TestCase):
         )
 
         for _ in range(100):
-<<<<<<< HEAD
 
-=======
->>>>>>> d5bf2df (Release v1.0)
             success, frame = self.app.camera.read()
 
             self.assertTrue(success)
@@ -206,11 +193,7 @@ class TestStability(unittest.TestCase):
         gc.collect()
 
         self.assertTrue(True)
-<<<<<<< HEAD
-        
-=======
 
 
->>>>>>> d5bf2df (Release v1.0)
 if __name__ == "__main__":
     unittest.main()
