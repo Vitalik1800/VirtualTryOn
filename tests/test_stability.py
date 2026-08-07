@@ -43,7 +43,7 @@ class TestStability(unittest.TestCase):
     def test_camera_restart(self):
 
         for _ in range(10):
-=
+
             self.assertTrue(
                 self.app.camera.open()
             )
