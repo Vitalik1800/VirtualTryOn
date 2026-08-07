@@ -23,6 +23,7 @@ from tkinter import filedialog
 
 logger = logging.getLogger(__name__)
 
+
 # ===
 # Stage 9.1
 # Video Manager
@@ -67,11 +68,11 @@ class VideoManager:
     # ===
 
     def start_recording(
-        self,
-        output_path,
-        width,
-        height,
-        fps=30
+            self,
+            output_path,
+            width,
+            height,
+            fps=30
     ):
         """
         Create VideoWriter and start recording.
@@ -89,7 +90,6 @@ class VideoManager:
         # Release previous writer
 
         if self.video_writer is not None:
-
             self.video_writer.release()
 
             self.video_writer = None
@@ -119,7 +119,6 @@ class VideoManager:
         )
 
         if not self.video_writer.isOpened():
-
             logger.error(
                 "Unable to create VideoWriter."
             )
@@ -147,7 +146,6 @@ class VideoManager:
         """
 
         if self.video_writer is not None:
-
             self.video_writer.release()
             self.video_writer = None
 
@@ -171,9 +169,9 @@ class VideoManager:
         """
 
         if (
-            not self.is_recording
-            or self.video_writer is None
-            or frame is None
+                not self.is_recording
+                or self.video_writer is None
+                or frame is None
         ):
             return
 
@@ -184,7 +182,8 @@ class VideoManager:
         except Exception as error:
 
             logger.exception(
-                "Failed to write video frame."
+                "Failed to write video frame.",
+                error
             )
 
             self.stop_recording()

@@ -21,6 +21,7 @@ import cv2
 
 logger = logging.getLogger(__name__)
 
+
 # ===
 # Stage 8.1
 # Photo Manager
@@ -106,7 +107,6 @@ class PhotoManager:
         )
 
         if not directory:
-
             logger.info(
                 "Directory selection cancelled."
             )
@@ -135,7 +135,7 @@ class PhotoManager:
         """
 
         return self.save_directory
-    
+
     # ===
     # Stage 8.3
     # Check save directory
@@ -210,7 +210,6 @@ class PhotoManager:
         # No frame
 
         if self.current_frame is None:
-
             logger.error(
                 "No frame available."
             )
@@ -220,7 +219,6 @@ class PhotoManager:
         # No save directory
 
         if self.save_directory is None:
-
             logger.error(
                 "Save directory not selected."
             )
@@ -230,7 +228,6 @@ class PhotoManager:
         output_path = self.generate_output_path()
 
         if output_path is None:
-
             logger.error(
                 "Save directory not selected."
             )
@@ -245,13 +242,12 @@ class PhotoManager:
             )
 
             if not success:
-
                 logger.error(
                     f"Unable to save photo: {output_path}"
                 )
 
                 return False
-            
+
         except PermissionError:
 
             logger.error(
@@ -260,10 +256,11 @@ class PhotoManager:
 
             return False
 
-        except Exception:
+        except Exception as error:
 
             logger.exception(
-                "Failed to save photo."
+                "Failed to save photo: %s",
+                error
             )
 
             return False
@@ -286,7 +283,7 @@ class PhotoManager:
 
         self.current_frame = None
         self.save_directory = None
-    
+
     # ===
     # Stage 8.9
     # Release resources

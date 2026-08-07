@@ -8,6 +8,8 @@ Description:
 Application configuration and default parameters.
 """
 
+from utils.resource_path import resource_path
+
 # ===
 # Stage 2.8
 # Application
@@ -49,12 +51,30 @@ OUTPUT_DIRECTORY = "output"
 # Assets
 # ===
 
-ASSETS_DIRECTORY = "assets"
-GLASSES_DIRECTORY = "assets/glasses"
-HATS_DIRECTORY = "assets/hats"
-EARRINGS_DIRECTORY = "assets/earrings"
-NECKLACES_DIRECTORY = "assets/necklaces"
-WATCHES_DIRECTORY = "assets/watches"
+ASSETS_DIRECTORY = resource_path("assets")
+
+ACCESSORIES_DIRECTORY = resource_path(
+    "assets",
+    "accessories"
+)
+
+GLASSES_DIRECTORY = resource_path(
+    "assets",
+    "accessories",
+    "glasses"
+)
+
+HATS_DIRECTORY = resource_path(
+    "assets",
+    "accessories",
+    "hats"
+)
+
+MASKS_DIRECTORY = resource_path(
+    "assets",
+    "accessories",
+    "masks"
+)
 
 # ===
 # Stage 2.8
@@ -69,5 +89,12 @@ DEFAULT_ACCESSORY = None
 # Files
 # ===
 
-ICON_PATH = "assets/icons/app.ico"
-README_FILE = "README.md"
+ICON_PATH = resource_path(
+    "assets",
+    "icons",
+    "app.ico"
+)
+
+README_FILE = resource_path(
+    "README.md"
+)

@@ -3,6 +3,7 @@ import numpy as np
 
 from core.accessory_renderer import AccessoryRenderer
 
+
 class TestAccessoryRenderer(unittest.TestCase):
 
     def setUp(self):
@@ -173,6 +174,7 @@ class TestAccessoryRenderer(unittest.TestCase):
             accessory_type,
             "glasses"
         )
+
 
 if __name__ == "__main__":
     unittest.main()

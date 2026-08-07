@@ -29,7 +29,8 @@ import logging
 # Configure Logger
 # ===
 
-logger = logging.getLogger(__name__) 
+logger = logging.getLogger(__name__)
+
 
 class Camera:
     """
@@ -62,19 +63,17 @@ class Camera:
         )
 
         if not self.capture.isOpened():
-
             logger.exception(
                 "Cannot initialize camera."
             )
-            
-            return False
 
+            return False
 
         # ===
         # Stage 3.2
         # Configure camera
         # ===
-        
+
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, CAMERA_WIDTH)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, CAMERA_HEIGHT)
         self.capture.set(cv2.CAP_PROP_FPS, FPS_LIMIT)
@@ -116,7 +115,6 @@ class Camera:
         # ===
 
         if not self.is_opened():
-
             logger.warning("Camera is not opened.")
 
             return False, None
@@ -129,13 +127,11 @@ class Camera:
         success, frame = self.capture.read()
 
         if not success:
-
             logger.warning("Failed to read frame.")
 
             return False, None
 
         if frame is None:
-
             logger.warning("Frame is empty.")
 
             return False, None
@@ -144,7 +140,7 @@ class Camera:
         # Stage 3.3
         # Return OpenCV frame
         # ===
-        
+
         return True, frame
 
     def is_opened(self) -> bool:
@@ -153,9 +149,9 @@ class Camera:
         """
 
         return (
-            self.capture is not None
-            and
-            self.capture.isOpened()
+                self.capture is not None
+                and
+                self.capture.isOpened()
         )
 
     def release(self):
@@ -171,7 +167,6 @@ class Camera:
         if self.capture is not None:
 
             if self.capture.isOpened():
-
                 self.capture.release()
 
             self.capture = None
@@ -184,7 +179,6 @@ class Camera:
         """
 
         if not self.is_opened():
-
             return {}
 
         return {

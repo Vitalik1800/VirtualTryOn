@@ -55,3 +55,6 @@ htmlcov/
 
 # Test reports
 test-results/
+
+# Release
+Release/

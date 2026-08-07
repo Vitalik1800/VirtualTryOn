@@ -16,7 +16,6 @@
 from ui.main_window import MainWindow
 import logging
 
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
@@ -29,6 +28,7 @@ logging.basicConfig(
     ]
 )
 
+
 # ===
 # Stage 2.1
 # Application entry point
@@ -37,6 +37,7 @@ logging.basicConfig(
 def main():
     app = MainWindow()
     app.run()
+
 
 if __name__ == "__main__":
     main()

@@ -13,9 +13,8 @@
 # Import libraries
 # ===
 
-import customtkinter as ctk
-
 from ui.theme import *
+
 
 # ===
 # Stage 2.7
@@ -27,6 +26,10 @@ class StatusBar(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
+        self.status_label = None
+        self.fps_label = None
+        self.camera_label = None
+
         self.configure_statusbar()
         self.create_widgets()
 
@@ -36,7 +39,6 @@ class StatusBar(ctk.CTkFrame):
     # ===
 
     def configure_statusbar(self):
-
         self.configure(
             height=40,
             corner_radius=0
@@ -54,7 +56,6 @@ class StatusBar(ctk.CTkFrame):
     # ===
 
     def create_widgets(self):
-
         # Application status
 
         self.status_label = ctk.CTkLabel(
@@ -105,7 +106,6 @@ class StatusBar(ctk.CTkFrame):
     # ===
 
     def set_status(self, text):
-
         self.status_label.configure(
             text=f"Status: {text}"
         )
@@ -116,7 +116,6 @@ class StatusBar(ctk.CTkFrame):
     # ===
 
     def set_fps(self, fps):
-
         self.fps_label.configure(
             text=f"FPS: {fps}"
         )
@@ -127,7 +126,6 @@ class StatusBar(ctk.CTkFrame):
     # ===
 
     def set_camera_status(self, text):
-
         self.camera_label.configure(
             text=f"Camera: {text}"
         )

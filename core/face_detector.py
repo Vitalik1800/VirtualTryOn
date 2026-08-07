@@ -20,6 +20,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 # ===
 # Stage 4.1
 # Face Detector
@@ -37,8 +38,10 @@ class FaceDetector:
         # Initialize MediaPipe Face Mesh
         # ===
 
+        self.face_mesh = None
+
         self.mp_face_mesh = mp.solutions.face_mesh
-        
+
         # ===
         # Stage 4.2
         # Configure Face Mesh
@@ -66,7 +69,6 @@ class FaceDetector:
         """
 
         if hasattr(self, "face_mesh") and self.face_mesh is not None:
-
             self.face_mesh.close()
             self.face_mesh = None
 
@@ -120,9 +122,8 @@ class FaceDetector:
         """
 
         if frame is None:
-
             self.last_results = None
-            
+
             return None
 
         if frame.size == 0:
@@ -168,9 +169,9 @@ class FaceDetector:
         """
 
         if (
-            results is None
-            or
-            results.multi_face_landmarks is None
+                results is None
+                or
+                results.multi_face_landmarks is None
         ):
             return []
 
@@ -179,7 +180,6 @@ class FaceDetector:
         landmarks = []
 
         for landmark in face.landmark:
-
             landmarks.append(
 
                 (
@@ -187,7 +187,7 @@ class FaceDetector:
                     landmark.y,
                     landmark.z
                 )
-                
+
             )
 
         return landmarks
@@ -210,11 +210,11 @@ class FaceDetector:
         """
 
         if (
-            results is None
-            or
-            results.multi_face_landmarks is None
-            or
-            frame is None
+                results is None
+                or
+                results.multi_face_landmarks is None
+                or
+                frame is None
         ):
             return []
 
@@ -225,7 +225,6 @@ class FaceDetector:
         points = []
 
         for landmark in face.landmark:
-
             x = int(landmark.x * width)
             y = int(landmark.y * height)
 
@@ -251,11 +250,11 @@ class FaceDetector:
         """
 
         if (
-            frame is None
-            or
-            results is None
-            or
-            results.multi_face_landmarks is None
+                frame is None
+                or
+                results is None
+                or
+                results.multi_face_landmarks is None
         ):
             return frame
 
@@ -264,7 +263,6 @@ class FaceDetector:
         for face_landmarks in results.multi_face_landmarks:
 
             for landmark in face_landmarks.landmark:
-
                 x = int(landmark.x * width)
                 y = int(landmark.y * height)
 
@@ -296,11 +294,11 @@ class FaceDetector:
         """
 
         if (
-            frame is None
-            or
-            results is None
-            or
-            results.multi_face_landmarks is None
+                frame is None
+                or
+                results is None
+                or
+                results.multi_face_landmarks is None
         ):
             return frame
 
@@ -311,7 +309,6 @@ class FaceDetector:
         )
 
         for face_landmarks in results.multi_face_landmarks:
-
             drawing_utils.draw_landmarks(
                 image=frame,
                 landmark_list=face_landmarks,
@@ -395,9 +392,9 @@ class FaceDetector:
         """
 
         return (
-            results is not None
-            and
-            results.multi_face_landmarks is not None
+                results is not None
+                and
+                results.multi_face_landmarks is not None
         )
 
     def process(self, frame):
@@ -420,9 +417,9 @@ class FaceDetector:
         self.frame_counter += 1
 
         if (
-            self.last_results is None
-            or
-            self.frame_counter % 2 == 0
+                self.last_results is None
+                or
+                self.frame_counter % 2 == 0
         ):
             results = self.detect(frame)
         else:

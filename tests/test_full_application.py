@@ -5,6 +5,10 @@ import unittest
 
 from ui.main_window import MainWindow
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d5bf2df (Release v1.0)
 class TestFullApplication(unittest.TestCase):
 
     def setUp(self):
@@ -67,7 +71,11 @@ class TestFullApplication(unittest.TestCase):
                 width,
                 height
             )
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> d5bf2df (Release v1.0)
         )
 
         # ---- Detect face ----
@@ -83,7 +91,11 @@ class TestFullApplication(unittest.TestCase):
             self.app.accessory_manager.select_category(
                 "glasses"
             )
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> d5bf2df (Release v1.0)
         )
 
         # ---- Select accessory ----
@@ -93,7 +105,11 @@ class TestFullApplication(unittest.TestCase):
             self.app.accessory_manager.select_accessory(
                 0
             )
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> d5bf2df (Release v1.0)
         )
 
         accessory = (
@@ -142,7 +158,10 @@ class TestFullApplication(unittest.TestCase):
         # ---- Record video ----
 
         for _ in range(20):
+<<<<<<< HEAD
 
+=======
+>>>>>>> d5bf2df (Release v1.0)
             success, frame = self.app.camera.read()
 
             self.assertTrue(success)
@@ -182,6 +201,11 @@ class TestFullApplication(unittest.TestCase):
         self.assertFalse(
             self.app.camera.is_opened()
         )
+<<<<<<< HEAD
     
+=======
+
+
+>>>>>>> d5bf2df (Release v1.0)
 if __name__ == "__main__":
     unittest.main()

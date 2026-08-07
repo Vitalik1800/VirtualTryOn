@@ -13,15 +13,14 @@
 # Import libraries
 # ===
 
-import cv2
+import logging
 
+import cv2
 from PIL import Image
 from PIL import ImageTk
 
-import time
-import logging
-
 logger = logging.getLogger(__name__)
+
 
 class ImageManager:
     """
@@ -31,11 +30,9 @@ class ImageManager:
     @staticmethod
     def frame_to_photo(frame, size=None):
 
-        start = time.perf_counter()
-
         if (
-            frame is None
-            or frame.size == 0
+                frame is None
+                or frame.size == 0
         ):
             return None
 
@@ -49,7 +46,6 @@ class ImageManager:
         image = Image.fromarray(frame)
 
         if size is not None:
-
             image = image.resize(
                 size,
                 Image.Resampling.BILINEAR

@@ -13,9 +13,8 @@
 # Import libraries
 # ===
 
-import customtkinter as ctk
-
 from ui.theme import *
+
 
 # ===
 # Stage 2.4
@@ -27,6 +26,14 @@ class Toolbar(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
+        self.logo_label = None
+        self.title_label = None
+        self.start_button = None
+        self.stop_button = None
+        self.save_button = None
+        self.help_button = None
+        self.about_button = None
+
         self.configure_toolbar()
         self.create_widgets()
 
@@ -36,7 +43,6 @@ class Toolbar(ctk.CTkFrame):
     # ===
 
     def configure_toolbar(self):
-
         self.configure(
             height=70,
             corner_radius=0
@@ -50,7 +56,6 @@ class Toolbar(ctk.CTkFrame):
     # ===
 
     def create_widgets(self):
-
         # Logo
 
         self.logo_label = ctk.CTkLabel(
@@ -160,7 +165,7 @@ class Toolbar(ctk.CTkFrame):
             padx=(0, PADDING),
             pady=15
         )
-        
+
         self.about_button = ctk.CTkButton(
             self,
             text="About",

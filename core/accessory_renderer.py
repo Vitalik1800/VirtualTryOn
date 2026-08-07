@@ -13,12 +13,11 @@
 # Import libraries
 # ===
 
-import math
-import cv2
-import os
-import time
-
 import logging
+import math
+import os
+
+import cv2
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +54,7 @@ RIGHT_EAR = 454
 GLASSES = "glasses"
 HAT = "hats"
 MASK = "masks"
+
 
 # ===
 # Stage 6.1
@@ -95,21 +95,19 @@ class AccessoryRenderer:
             image = self.trim_transparent(image)
 
             if image is None:
-
                 logger.error(
                     "Cannot load accessory: %s",
-                    path
+                    accessory_path
                 )
 
-                return frame
+                return None
 
             if image.shape[2] != 4:
-
                 logger.warning(
                     "Accessory has no alpha channel."
                 )
 
-                return frame
+                return None
 
             self.cache[accessory_path] = image
 
@@ -121,11 +119,11 @@ class AccessoryRenderer:
     # ===
 
     def render(
-        self,
-        frame,
-        accessory,
-        landmarks,
-        accessory_path
+            self,
+            frame,
+            accessory,
+            landmarks,
+            accessory_path
     ):
         """
         Render accessory on frame.
@@ -134,16 +132,18 @@ class AccessoryRenderer:
             frame: OpenCV frame.
             accessory: PNG image.
             landmarks: Face landmarks.
+            accessory_path: Path to accessory PNG file.
 
         Returns:
             OpenCV frame.
         """
+
         try:
 
             if (
-                frame is None
-                or accessory is None
-                or not landmarks
+                    frame is None
+                    or accessory is None
+                    or not landmarks
             ):
                 return frame
 
@@ -153,8 +153,8 @@ class AccessoryRenderer:
                 return frame
 
             if (
-                anchors["left_eye"] is None or
-                anchors["right_eye"] is None
+                    anchors["left_eye"] is None or
+                    anchors["right_eye"] is None
             ):
                 return frame
 
@@ -172,9 +172,9 @@ class AccessoryRenderer:
                 (anchors["left_eye"][0] + anchors["right_eye"][0]) // 2,
                 (anchors["left_eye"][1] + anchors["right_eye"][1]) // 2
             )
-            
+
             # Face width
-            
+
             accessory_type = self.get_accessory_type(accessory_path)
 
             accessory = self.get_cached_accessory(
@@ -203,7 +203,7 @@ class AccessoryRenderer:
                     face_width,
                     angle
                 )
-            
+
             elif accessory_type == MASK:
                 return self.render_mask(
                     frame,
@@ -213,7 +213,7 @@ class AccessoryRenderer:
                     angle,
                     eye_center
                 )
-            
+
             return frame
 
         except Exception as error:
@@ -341,12 +341,12 @@ class AccessoryRenderer:
     # ===
 
     def calculate_position(
-        self,
-        accessory,
-        anchor_point,
-        offset_x=0,
-        offset_y=0,
-        align="center"
+            self,
+            accessory,
+            anchor_point,
+            offset_x=0,
+            offset_y=0,
+            align="center"
     ):
         """
         Calculate top-left position for accessory.
@@ -356,6 +356,7 @@ class AccessoryRenderer:
             anchor_point: (x, y) anchor point.
             offset_x: Horizontal offset.
             offset_y: Vertical offset.
+            align: Alignment mode ("center", "top", or "bottom").
 
         Returns:
             (x, y) position.
@@ -385,7 +386,10 @@ class AccessoryRenderer:
             x = anchor_point[0] - width // 2 + offset_x
             y = anchor_point[1] - height + offset_y
 
-        return (x, y)
+        else:
+            raise ValueError(f"Unknown alignment: {align}")
+
+        return x, y
 
     # ===
     # Stage 6.6
@@ -393,9 +397,9 @@ class AccessoryRenderer:
     # ===
 
     def calculate_angle(
-        self,
-        left_eye,
-        right_eye
+            self,
+            left_eye,
+            right_eye
     ):
         """
         Calculate head rotation angle.
@@ -426,9 +430,9 @@ class AccessoryRenderer:
     # ===
 
     def rotate_accessory(
-        self,
-        accessory,
-        angle
+            self,
+            accessory,
+            angle
     ):
         """
         Rotate accessory image.
@@ -448,7 +452,7 @@ class AccessoryRenderer:
         height, width = accessory.shape[:2]
 
         center = (
-            width //2,
+            width // 2,
             height // 2
         )
 
@@ -470,11 +474,11 @@ class AccessoryRenderer:
         return rotated
 
     def get_transformed_accessory(
-        self,
-        accessory,
-        accessory_path,
-        width,
-        angle
+            self,
+            accessory,
+            accessory_path,
+            width,
+            angle
     ):
         """
         Return cached scaled and rotated accessory.
@@ -521,10 +525,10 @@ class AccessoryRenderer:
     # ===
 
     def alpha_blend(
-        self,
-        frame,
-        accessory,
-        position
+            self,
+            frame,
+            accessory,
+            position
     ):
         """
         Blend RGBA accessory with BGR frame.
@@ -539,9 +543,9 @@ class AccessoryRenderer:
         """
 
         if (
-            frame is None
-            or accessory is None
-            or position is None
+                frame is None
+                or accessory is None
+                or position is None
         ):
             return frame
 
@@ -553,10 +557,10 @@ class AccessoryRenderer:
         # Completely outside the frame
 
         if (
-            x >= frame_w
-            or y >= frame_h
-            or x + acc_w <= 0
-            or y + acc_h <= 0
+                x >= frame_w
+                or y >= frame_h
+                or x + acc_w <= 0
+                or y + acc_h <= 0
         ):
             return frame
 
@@ -575,33 +579,33 @@ class AccessoryRenderer:
         acc_y2 = acc_y1 + (y2 - y1)
 
         accessory_crop = accessory[
-            acc_y1:acc_y2,
-            acc_x1:acc_x2
-        ]
+                         acc_y1:acc_y2,
+                         acc_x1:acc_x2
+                         ]
 
         alpha = accessory_crop[:, :, 3:4].astype("float32") / 255.0
 
         frame_crop = frame[
-            y1:y2,
-            x1:x2
-        ]
+                     y1:y2,
+                     x1:x2
+                     ]
 
         frame[y1:y2, x1:x2] = (
-            alpha * accessory_crop[:, :, :3]
-            +
-            (1.0 - alpha) * frame_crop
+                alpha * accessory_crop[:, :, :3]
+                +
+                (1.0 - alpha) * frame_crop
         ).astype("uint8")
 
         return frame
 
     def render_hat(
-        self,
-        frame,
-        accessory,
-        anchors,
-        accessory_path,
-        face_width,
-        angle
+            self,
+            frame,
+            accessory,
+            anchors,
+            accessory_path,
+            face_width,
+            angle
     ):
 
         width = int(face_width * 3.4)
@@ -642,13 +646,13 @@ class AccessoryRenderer:
         )
 
     def render_mask(
-        self,
-        frame,
-        accessory,
-        accessory_path,
-        face_width,
-        angle,
-        eye_center
+            self,
+            frame,
+            accessory,
+            accessory_path,
+            face_width,
+            angle,
+            eye_center
     ):
 
         width = int(face_width * 2.2)
@@ -673,13 +677,13 @@ class AccessoryRenderer:
         )
 
     def render_glasses(
-        self,
-        frame,
-        accessory,
-        accessory_path,
-        face_width,
-        angle,
-        eye_center
+            self,
+            frame,
+            accessory,
+            accessory_path,
+            face_width,
+            angle,
+            eye_center
     ):
 
         width = int(face_width * 2.2)

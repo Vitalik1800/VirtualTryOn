@@ -17,6 +17,7 @@ import tkinter as tk
 
 from ui.theme import *
 
+
 # ===
 # Stage 3.5
 # Camera Preview
@@ -27,6 +28,7 @@ class CameraPreview(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
+        self.preview_label = None
         self.configure_preview()
         self.create_widgets()
 
@@ -36,7 +38,6 @@ class CameraPreview(ctk.CTkFrame):
     # ===
 
     def configure_preview(self):
-
         self.configure(
             corner_radius=PREVIEW_CORNER_RADIUS,
             border_width=PREVIEW_BORDER_WIDTH
@@ -51,11 +52,9 @@ class CameraPreview(ctk.CTkFrame):
     # ===
 
     def create_widgets(self):
-
         self.preview_label = tk.Label(
             self,
             text="Camera Preview",
-            image=None,
             font=TITLE_FONT
         )
 

@@ -2,6 +2,10 @@ import unittest
 
 from ui.main_window import MainWindow
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d5bf2df (Release v1.0)
 class TestFacePipeline(unittest.TestCase):
 
     def setUp(self):
@@ -123,12 +127,20 @@ class TestFacePipeline(unittest.TestCase):
             )
 
             ok = True
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> d5bf2df (Release v1.0)
         except Exception:
 
             ok = False
 
         self.assertTrue(ok)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d5bf2df (Release v1.0)
 if __name__ == "__main__":
     unittest.main()

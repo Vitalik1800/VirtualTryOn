@@ -14,10 +14,12 @@
 # ===
 
 import os
+from core.settings import ACCESSORIES_DIRECTORY
 import cv2
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 # ===
 # Stage 5.1
@@ -36,10 +38,7 @@ class AccessoryManager:
 
         # Root accessories directory
 
-        self.accessories_path = os.path.join(
-            "assets",
-            "accessories"
-        )
+        self.accessories_path = ACCESSORIES_DIRECTORY
 
         # Cached images
 
@@ -57,10 +56,7 @@ class AccessoryManager:
         self.categories = [
             "glasses",
             "hats",
-            "earrings",
-            "necklaces",
-            "masks",
-            "watches"
+            "masks"
         ]
 
         # ===
@@ -105,23 +101,21 @@ class AccessoryManager:
         # Check file exists
 
         if not os.path.isfile(file_path):
-
             logger.error(
                 f"Accessory not found: {file_path}"
             )
-            
+
             return None
 
         # Invalid extension
 
         if not file_path.lower().endswith(".png"):
-
             logger.error(
                 f"Unsupported format: {file_path}"
             )
 
             return None
-        
+
         # Load PNG with alpha channel
 
         image = cv2.imread(
@@ -130,21 +124,19 @@ class AccessoryManager:
         )
 
         if image is None:
-
             logger.error(
                 f"Unable to read PNG: {file_path}"
             )
-            
+
             return None
 
         # PNG should contain alpha channel
 
         if len(image.shape) != 3 or image.shape[2] != 4:
-
             logger.error(
                 f"PNG has no alpha channel: {file_path}"
             )
-            
+
             return None
 
         return image
@@ -208,7 +200,6 @@ class AccessoryManager:
         )
 
         if not os.path.isdir(folder):
-
             logger.error(
                 f"Accessory folder not found: {folder}"
             )
@@ -220,7 +211,6 @@ class AccessoryManager:
         for file_name in sorted(os.listdir(folder)):
 
             if file_name.lower().endswith(".png"):
-
                 accessories.append(
                     os.path.join(
                         folder,
@@ -229,7 +219,7 @@ class AccessoryManager:
                 )
 
         return accessories
-    
+
     # ===
     # Stage 5.6
     # Select accessory category
@@ -249,11 +239,10 @@ class AccessoryManager:
         accessories = self.get_accessories(category)
 
         if not accessories:
-
             logger.warning(
                 f"No accessories found in '{category}'."
             )
-            
+
             return False
 
         self.current_category = category
@@ -333,8 +322,8 @@ class AccessoryManager:
             return -1
 
         self.current_index = (
-            self.current_index + 1
-        ) % len(self.current_accessories)
+                                     self.current_index + 1
+                             ) % len(self.current_accessories)
 
         self.get_current_accessory()
 
@@ -354,8 +343,8 @@ class AccessoryManager:
             return -1
 
         self.current_index = (
-            self.current_index - 1
-        ) % len(self.current_accessories)
+                                     self.current_index - 1
+                             ) % len(self.current_accessories)
 
         self.get_current_accessory()
 

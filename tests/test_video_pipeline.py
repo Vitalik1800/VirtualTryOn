@@ -3,10 +3,16 @@ import shutil
 import tempfile
 import unittest
 
+<<<<<<< HEAD
 import cv2
 
 from ui.main_window import MainWindow
 
+=======
+from ui.main_window import MainWindow
+
+
+>>>>>>> d5bf2df (Release v1.0)
 class TestVideoPipeline(unittest.TestCase):
 
     def setUp(self):
@@ -34,7 +40,11 @@ class TestVideoPipeline(unittest.TestCase):
 
         self.app.accessory_manager.select_category("glasses")
         self.app.accessory_manager.select_accessory(0)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> d5bf2df (Release v1.0)
     def tearDown(self):
 
         try:
@@ -68,7 +78,10 @@ class TestVideoPipeline(unittest.TestCase):
     def test_record_frames(self):
 
         for _ in range(10):
+<<<<<<< HEAD
 
+=======
+>>>>>>> d5bf2df (Release v1.0)
             success, frame = self.app.camera.read()
 
             self.assertTrue(success)
@@ -127,7 +140,10 @@ class TestVideoPipeline(unittest.TestCase):
         )
 
         for _ in range(10):
+<<<<<<< HEAD
 
+=======
+>>>>>>> d5bf2df (Release v1.0)
             success, frame = self.app.camera.read()
 
             self.assertTrue(success)
@@ -168,5 +184,9 @@ class TestVideoPipeline(unittest.TestCase):
             0
         )
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d5bf2df (Release v1.0)
 if __name__ == "__main__":
     unittest.main()

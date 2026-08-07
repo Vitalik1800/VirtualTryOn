@@ -13,11 +13,11 @@
 # Import libraries
 # ===
 
-import customtkinter as ctk
-import tkinter as tk
 import os
+import tkinter as tk
 
 from ui.theme import *
+
 
 # ===
 # Stage 2.5
@@ -33,6 +33,11 @@ class Sidebar(ctk.CTkFrame):
         selection_callback
     ):
         super().__init__(master)
+
+        self.title_label = None
+        self.category_menu = None
+        self.accessories_label = None
+        self.accessory_list = None
 
         self.callback = category_callback
         self.selection_callback = selection_callback
@@ -142,7 +147,7 @@ class Sidebar(ctk.CTkFrame):
 
         self.accessory_list.event_generate("<<ListboxSelect>>")
 
-    def on_accessory_selected(self, event):
+    def on_accessory_selected(self, _event):
 
         selection = self.accessory_list.curselection()
 

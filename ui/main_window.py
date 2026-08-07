@@ -42,6 +42,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 # ===
 # Stage 2.1
 # Main window class
@@ -52,6 +53,11 @@ class MainWindow(ctk.CTk):
     def __init__(self):
         super().__init__()
 
+        self.main_frame = None
+        self.toolbar = None
+        self.sidebar = None
+        self.camera_preview = None
+        self.status_bar = None
         self.configure_window()
         self.create_layout()
 
@@ -123,7 +129,7 @@ class MainWindow(ctk.CTk):
 
         self.fps = 0
 
-    def show_shortcuts(self, event=None):
+    def show_shortcuts(self, _event=None):
 
         messagebox.showinfo(
             "Keyboard Shortcuts",
@@ -135,7 +141,7 @@ class MainWindow(ctk.CTk):
             "Ctrl+Q   Exit"
         )
 
-    def show_about(self, event=None):
+    def show_about(self, _event=None):
 
         messagebox.showinfo(
             f"About {APP_NAME}",
@@ -148,7 +154,7 @@ class MainWindow(ctk.CTk):
             "• MediaPipe\n"
             "• CustomTkinter"
         )
-        
+
     # ===
     # Stage 2.1
     # Configure application window
@@ -315,7 +321,7 @@ class MainWindow(ctk.CTk):
     # Start camera
     # ===
 
-    def start_camera(self, event=None):
+    def start_camera(self, _event=None):
 
         if self.is_camera_running:
             return
@@ -357,9 +363,9 @@ class MainWindow(ctk.CTk):
             )
 
             if not self.video_manager.start_recording(
-                output_path,
-                width,
-                height
+                    output_path,
+                    width,
+                    height
             ):
                 self.show_error(
                     "Video Error",
@@ -372,7 +378,7 @@ class MainWindow(ctk.CTk):
                 return
 
             self.last_time = time.perf_counter()
-            
+
             self.update_camera()
 
         else:
@@ -388,7 +394,7 @@ class MainWindow(ctk.CTk):
                 "- Camera is already in use.\n"
                 "- Access to the camera is denied."
             )
-            
+
     # ===
     # Stage 3.5
     # Update preview
@@ -407,7 +413,6 @@ class MainWindow(ctk.CTk):
             success, frame = self.camera.read()
 
             if not success or frame is None:
-
                 self.stop_camera()
 
                 self.show_error(
@@ -428,13 +433,12 @@ class MainWindow(ctk.CTk):
             self.last_time = current
 
             if delta > 0:
-
                 current_fps = 1.0 / delta
 
                 self.fps = self.fps * 0.9 + current_fps * 0.1
 
                 self.status_bar.set_fps(round(self.fps))
-                        
+
             # ===
             # Stage 6.2
             # Accessory rendering
@@ -477,7 +481,6 @@ class MainWindow(ctk.CTk):
             self.camera_preview.preview_label.image = image
 
             if self.is_camera_running and self.winfo_exists():
-                
                 processing_time = (time.perf_counter() - current) * 1000
 
                 delay = max(
@@ -502,24 +505,22 @@ class MainWindow(ctk.CTk):
                 "Unexpected Error",
                 "Unexpected error occurred."
             )
-                
+
     # ===
     # Stage 3.5
     # Stop camera
     # ===
 
-    def stop_camera(self, event=None):
+    def stop_camera(self, _event=None):
 
         self.is_camera_running = False
 
         if self.camera_job is not None:
-
             self.after_cancel(self.camera_job)
 
             self.camera_job = None
 
         if self.camera.is_opened():
-
             self.camera.release()
 
         # ===
@@ -624,8 +625,7 @@ class MainWindow(ctk.CTk):
             )
 
             return
-            
-            
+
     def change_category(self, value):
 
         self.status_bar.set_status(
@@ -642,7 +642,6 @@ class MainWindow(ctk.CTk):
                 )
 
                 if not accessories:
-
                     self.sidebar.update_accessories([])
 
                     self.status_bar.set_status(
@@ -672,13 +671,13 @@ class MainWindow(ctk.CTk):
                 f"Folder not found:\n\n{e}"
             )
 
-    def previous_accessory(self, event=None):
+    def previous_accessory(self, _event=None):
 
         index = self.accessory_manager.previous_accessory()
 
         self.sidebar.select_accessory(index)
 
-    def next_accessory(self, event=None):
+    def next_accessory(self, _event=None):
 
         index = self.accessory_manager.next_accessory()
 
@@ -695,7 +694,6 @@ class MainWindow(ctk.CTk):
         """
 
         if not self.is_camera_running:
-
             self.show_error(
                 "Save Error",
                 "Camera is not running."
@@ -704,7 +702,6 @@ class MainWindow(ctk.CTk):
             return
 
         if not self.photo_manager.has_frame():
-
             self.show_error(
                 "Save Error",
                 "No frame available."
@@ -743,7 +740,7 @@ class MainWindow(ctk.CTk):
     # Close application
     # ===
 
-    def close_application(self, event=None):
+    def close_application(self, _event=None):
 
         gc.collect()
 
@@ -758,7 +755,6 @@ class MainWindow(ctk.CTk):
         # Cancel scheduled update
 
         if self.camera_job is not None:
-
             self.after_cancel(self.camera_job)
 
             self.camera_job = None
@@ -766,7 +762,6 @@ class MainWindow(ctk.CTk):
         # Release camera
 
         if self.camera.is_opened():
-
             self.camera.release()
 
         # ===
@@ -789,8 +784,7 @@ class MainWindow(ctk.CTk):
         self.accessory_renderer = None
         self.photo_manager = None
         self.video_manager = None
-            
-        # Destroy application window
-        
-        self.destroy()
 
+        # Destroy application window
+
+        self.destroy()

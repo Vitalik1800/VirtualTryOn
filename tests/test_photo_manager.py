@@ -7,10 +7,10 @@ import numpy as np
 
 from core.photo_manager import PhotoManager
 
+
 class TestPhotoManager(unittest.TestCase):
 
     def setUp(self):
-
         self.manager = PhotoManager()
 
         self.temp_dir = tempfile.mkdtemp()
@@ -23,7 +23,6 @@ class TestPhotoManager(unittest.TestCase):
         )
 
     def tearDown(self):
-
         self.manager.close()
 
         shutil.rmtree(
@@ -37,7 +36,6 @@ class TestPhotoManager(unittest.TestCase):
     # ==========================
 
     def test_has_save_directory(self):
-
         self.assertTrue(
             self.manager.has_save_directory()
         )
@@ -48,7 +46,6 @@ class TestPhotoManager(unittest.TestCase):
     # ==========================
 
     def test_save_photo(self):
-
         self.manager.update_frame(self.frame)
 
         path = self.manager.save_photo()
@@ -65,7 +62,6 @@ class TestPhotoManager(unittest.TestCase):
     # ==========================
 
     def test_no_frame(self):
-
         self.assertFalse(
             self.manager.has_frame()
         )
@@ -80,7 +76,6 @@ class TestPhotoManager(unittest.TestCase):
     # ==========================
 
     def test_invalid_directory(self):
-
         self.manager.update_frame(self.frame)
 
         self.manager.save_directory = "Z:/folder/does/not/exist"
@@ -88,6 +83,7 @@ class TestPhotoManager(unittest.TestCase):
         result = self.manager.save_photo()
 
         self.assertFalse(result)
+
 
 if __name__ == "__main__":
     unittest.main()

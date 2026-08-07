@@ -7,10 +7,10 @@ import numpy as np
 
 from core.video_manager import VideoManager
 
+
 class TestVideoManager(unittest.TestCase):
 
     def setUp(self):
-
         self.manager = VideoManager()
 
         self.temp_dir = tempfile.mkdtemp()
@@ -23,7 +23,6 @@ class TestVideoManager(unittest.TestCase):
         )
 
     def tearDown(self):
-
         self.manager.close()
 
         shutil.rmtree(
@@ -37,7 +36,6 @@ class TestVideoManager(unittest.TestCase):
     # ==========================
 
     def test_create_video(self):
-
         output = self.manager.create_output_path()
 
         result = self.manager.start_recording(
@@ -58,7 +56,6 @@ class TestVideoManager(unittest.TestCase):
     # ==========================
 
     def test_write_frame(self):
-
         output = self.manager.create_output_path()
 
         self.manager.start_recording(
@@ -79,7 +76,6 @@ class TestVideoManager(unittest.TestCase):
     # ==========================
 
     def test_stop_recording(self):
-
         output = self.manager.create_output_path()
 
         self.manager.start_recording(
@@ -104,7 +100,6 @@ class TestVideoManager(unittest.TestCase):
     # ==========================
 
     def test_invalid_output(self):
-
         result = self.manager.start_recording(
             "Z:/invalid/folder/video.mp4",
             640,
@@ -112,6 +107,7 @@ class TestVideoManager(unittest.TestCase):
         )
 
         self.assertFalse(result)
+
 
 if __name__ == "__main__":
     unittest.main()

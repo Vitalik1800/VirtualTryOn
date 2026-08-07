@@ -15,6 +15,7 @@ import unittest
 
 from core.accessory_manager import AccessoryManager
 
+
 class TestAccessoryManager(unittest.TestCase):
 
     def setUp(self):
@@ -78,7 +79,6 @@ class TestAccessoryManager(unittest.TestCase):
         )
 
         for accessory in accessories:
-
             self.assertTrue(
                 accessory.endswith(".png")
             )
@@ -149,9 +149,9 @@ class TestAccessoryManager(unittest.TestCase):
             )
 
             with open(
-                invalid_png,
-                "w",
-                encoding="utf-8"
+                    invalid_png,
+                    "w",
+                    encoding="utf-8"
             ) as file:
 
                 file.write(
@@ -201,6 +201,6 @@ class TestAccessoryManager(unittest.TestCase):
             first
         )
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     unittest.main()

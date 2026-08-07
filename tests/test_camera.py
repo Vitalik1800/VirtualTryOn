@@ -12,6 +12,7 @@ import unittest
 
 from core.camera import Camera
 
+
 class TestCamera(unittest.TestCase):
 
     def setUp(self):
@@ -71,6 +72,7 @@ class TestCamera(unittest.TestCase):
         self.assertFalse(
             self.camera.is_opened()
         )
+
 
 if __name__ == "__main__":
     unittest.main()

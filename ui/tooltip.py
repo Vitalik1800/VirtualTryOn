@@ -1,5 +1,6 @@
 import customtkinter as ctk
 
+
 class ToolTip:
 
     def __init__(self, widget, text):
@@ -12,7 +13,7 @@ class ToolTip:
         widget.bind("<Enter>", self.show)
         widget.bind("<Leave>", self.hide)
 
-    def show(self, event=None):
+    def show(self, _event=None):
 
         if self.tip:
             return
@@ -36,10 +37,9 @@ class ToolTip:
             pady=4
         )
 
-    def hide(self, event=None):
+    def hide(self, _event=None):
 
         if self.tip:
-
             self.tip.destroy()
 
             self.tip = None

@@ -13,6 +13,7 @@ import cv2
 
 from core.face_detector import FaceDetector
 
+
 class TestFaceDetector(unittest.TestCase):
 
     def setUp(self):
@@ -59,6 +60,7 @@ class TestFaceDetector(unittest.TestCase):
 
         self.assertIsInstance(x, int)
         self.assertIsInstance(y, int)
+
 
 if __name__ == "__main__":
     unittest.main()

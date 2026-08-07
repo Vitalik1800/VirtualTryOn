@@ -2,6 +2,10 @@ import unittest
 
 from ui.main_window import MainWindow
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d5bf2df (Release v1.0)
 class TestCameraIntegration(unittest.TestCase):
 
     def setUp(self):
@@ -83,5 +87,9 @@ class TestCameraIntegration(unittest.TestCase):
 
         self.assertIsNotNone(image)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d5bf2df (Release v1.0)
 if __name__ == "__main__":
     unittest.main()
