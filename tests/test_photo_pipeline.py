@@ -5,10 +5,6 @@ import unittest
 
 from ui.main_window import MainWindow
 
-<<<<<<< HEAD
-=======
-
->>>>>>> d5bf2df (Release v1.0)
 class TestPhotoPipeline(unittest.TestCase):
 
     def setUp(self):
@@ -168,9 +164,6 @@ class TestPhotoPipeline(unittest.TestCase):
             os.path.isfile(saved_path)
         )
 
-<<<<<<< HEAD
-=======
 
->>>>>>> d5bf2df (Release v1.0)
 if __name__ == "__main__":
     unittest.main()
